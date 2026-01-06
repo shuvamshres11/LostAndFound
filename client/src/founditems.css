@@ -1,0 +1,82 @@
+/* FORCE FULL WIDTH */
+.full-page-wrapper {
+  width: 100vw !important;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+/* CONTENT SPACING */
+.content-container {
+  margin-top: 80px; /* Space for the fixed navbar */
+  padding: 40px 50px;
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* Keeps titles on the left */
+}
+
+.page-header {
+  width: 100%;
+  margin-bottom: 30px;
+}
+
+.page-header h1 {
+  font-size: 42px;
+  font-weight: 700;
+  margin: 0;
+}
+
+/* THE GRID - This fills the right side */
+.item-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); 
+  gap: 30px;
+  width: 100%; 
+  box-sizing: border-box;
+}
+
+/* CARD STYLING */
+.item-card {
+  border: 1px solid #eee;
+  border-radius: 16px;
+  padding: 24px;
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+}
+
+.image-box {
+  background: #f9f9f9;
+  height: 240px;
+  border-radius: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+
+.image-box img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.btn-post {
+  width: 100%;
+  padding: 14px;
+  background: #5c7cbe; /* Matches the blue in your design */
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 15px;
+}

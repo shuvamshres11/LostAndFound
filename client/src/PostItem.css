@@ -1,0 +1,194 @@
+* {
+  box-sizing: border-box;
+}
+/* Add this at the very top of PostItem.css */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+/* Ensure the root body doesn't cause alignment issues */
+body, #root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+.page-layout {
+  display: flex;
+  flex-direction: column;
+  width: 100vw; /* Use viewport width */
+  min-height: 100vh;
+  background-color: #f9fafb;
+  align-items: center; /* Center children horizontally */
+}
+
+.nav-spacer {
+  height: 80px; 
+  width: 100%;
+}
+
+/* Fix for centering content and footer */
+.main-content-viewport {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  max-width: 1200px; /* Limits content spread on ultra-wide screens */
+  padding: 40px 20px;
+  box-sizing: border-box;
+}
+
+.page-header-text {
+  text-align: center;
+  margin-bottom: 25px;
+  color: #111827;
+}
+
+.centered-form-wrapper {
+  width: 100%;
+  max-width: 700px; /* INCREASED to 700px to match your card */
+  margin: 0 auto;
+}
+
+.main-card-ui {
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  width: 100%;             /* CHANGED from 700px to 100% */
+  overflow: hidden;
+  display: block;          /* Ensures it doesn't use flex centering which shifts content */
+}
+
+.actual-entry-form {
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;             /* Ensures form fills the card */
+  margin: 0;               /* Resets any accidental margins */
+}
+
+/* ISSUE #4 FIX: White backgrounds for inputs */
+.field-group input, 
+.field-group select, 
+.field-group textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background-color: #ffffff !important; /* Forces white color */
+  color: #1f2937; /* Dark text for contrast */
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.field-group label {
+  font-weight: 500;
+  font-size: 14px;
+  color: #374151;
+}
+.photo-upload-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centers items horizontally */
+  justify-content: center; /* Centers items vertically */
+  padding: 40px;
+  border: 2px dashed #d1d5db;
+  border-radius: 12px;
+  background-color: #f9fafb;
+  cursor: pointer;
+  transition: border-color 0.2s;
+  text-align: center;
+}
+
+.photo-upload-zone:hover {
+  border-color: #3b82f6; /* Blue border on hover */
+}
+
+.photo-upload-zone .icon {
+  font-size: 32px;
+  margin-bottom: 12px;
+  color: #3b82f6; /* Blue icon */
+}
+
+/* This makes the "Upload a file" text look like a blue link/button */
+.photo-upload-zone p span {
+  color: #3b82f6;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.photo-upload-zone small {
+  color: #6b7280;
+  margin-top: 8px;
+}
+
+.upload-preview-img {
+  max-width: 100%;
+  max-height: 250px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+/* ISSUE #3 FIX: Red for Lost, Green for Found */
+.tab-navigation {
+  display: flex;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.tab-item {
+  flex: 1;
+  padding: 16px;
+  background: none;
+  border: none;
+  font-weight: 600;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+/* Lost Tab Style */
+.lost-tab.active {
+  color: #dc2626;
+  background-color: #fef2f2;
+  border-bottom: 3px solid #dc2626;
+}
+
+/* Found Tab Style (Green) */
+.found-tab.active {
+  color: #16a34a;
+  background-color: #f0fdf4;
+  border-bottom: 3px solid #16a34a;
+}
+
+.submit-form-btn.found {
+    background-color: #16a34a;
+}
+
+/* Submit Button Colors */
+.submit-form-btn {
+  width: 100%;
+  background-color: #5d81c4;
+  color: white;
+  padding: 16px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Footer Fix */
+footer {
+  width: 100% !important;
+  margin-top: auto;
+}
+
+@media (max-width: 600px) {
+  .field-row { grid-template-columns: 1fr; }
+}

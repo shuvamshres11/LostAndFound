@@ -1,0 +1,112 @@
+.contact-page-wrapper {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #fff;
+}
+
+.contact-main {
+  max-width: 1200px;
+  margin: 0;
+  /* Remove auto centering */
+  margin-left: 50px;
+  /* shift to left with some spacing */
+  padding: 120px 40px 60px;
+}
+
+.contact-header h1 {
+  font-size: 40px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  /* Equal width to pull sidebar further left */
+  gap: 30px;
+  /* Reduced gap */
+  margin-top: 40px;
+}
+
+.contact-form {
+  padding: 30px;
+  border: 1px solid #eee;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.02);
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+/* FIX: Forces white background for inputs to prevent browser themes from changing color */
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #ffffff !important;
+  color: #333;
+  font-family: inherit;
+  outline: none;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  border-color: #5c7cbe;
+}
+
+.send-btn {
+  width: 100%;
+  padding: 15px;
+  background-color: #5c7cbe;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.send-btn:hover {
+  opacity: 0.9;
+}
+
+.contact-info-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.info-card {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 20px;
+  border: 1px solid #eee;
+  border-radius: 12px;
+}
+
+.info-card h4 {
+  margin: 0;
+  font-size: 14px;
+  color: #888;
+}
+
+.info-card p {
+  margin: 5px 0 0;
+  font-weight: 600;
+}
+
+.sidebar-img {
+  width: 100%;
+  border-radius: 12px;
+  margin-top: 10px;
+}

@@ -1,0 +1,174 @@
+/* GLOBAL STYLES */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+  color: #000;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* MAIN LOGIN LAYOUT */
+.login-container {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  position: relative;
+}
+
+/* LEFT SIDE */
+.left-side {
+  width: 50%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding-left: 60px;
+}
+
+/* RIGHT SIDE */
+.right-side {
+  width: 50%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+/* DIVIDER */
+.divider {
+  position: absolute;
+  left: 50%;
+  top: 10%;
+  height: 80%;
+  width: 1px;
+  background: #dcdcdc;
+}
+
+/* LOGO + TITLE */
+.logo-img {
+  width: 140px;
+  margin-bottom: 10px;
+}
+
+.app-title {
+  text-align: center;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 38px;
+  letter-spacing: 1px;
+}
+
+.app-title span {
+  display: block;
+  font-size: 22px;
+  margin-top: 4px;
+  letter-spacing: 6px;
+}
+
+/* FORM ELEMENTS */
+.form-title {
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 25px;
+  color: #000;
+}
+
+.input-box {
+  width: 65%;
+}
+
+.input-box input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin-bottom: 18px;
+  font-size: 15px;
+  outline: none;
+  background-color: #000;
+  /* Set background to black */
+  color: #fff;
+  /* Set text to white */
+}
+
+.input-box input:focus {
+  border-color: #fff;
+  /* Changed to white for better visibility on black */
+}
+
+/* Password Toggle */
+.password-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.password-wrapper input {
+  width: 100%;
+  padding-right: 40px;
+  /* Make room for the button */
+}
+
+.toggle-password-btn {
+  position: absolute;
+  background-color: #ccc;
+  right: 10px;
+  top: 35%;
+  /* Center vertically (adjust based on input height) */
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  z-index: 10;
+  /* Ensure it's above the input */
+  color: #ccc;
+  /* Lighter grey for better visibility */
+}
+
+/* Forgot Password */
+.forgot {
+  width: 65%;
+  text-align: right;
+  margin-top: -10px;
+  margin-bottom: 18px;
+  font-size: 14px;
+  cursor: pointer;
+  color: #000;
+  font-weight: 700;
+  /* Increased to 700 (Bold) to match visual weight */
+}
+
+/* Login Button */
+.btn {
+  width: 65%;
+  padding: 14px 10px;
+  background: #000;
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 16px;
+  margin-top: 10px;
+  cursor: pointer;
+}
+
+/* Signup link */
+.switch-text {
+  margin-top: 15px;
+  font-size: 14px;
+}
+
+.switch-link {
+  font-weight: 600;
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
+}

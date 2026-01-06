@@ -1,0 +1,193 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: auto;              /* ✅ allow page to grow */
+  overflow-x: hidden;
+  overflow-y: auto;          /* ✅ ENABLE SCROLL */
+  font-family: "Inter", sans-serif;
+  color: #000000;
+  background-color: white;
+}
+
+.homepage {
+  width: 100%;
+  min-height: 100vh;         /* ✅ page can grow */
+  display: flex;
+  flex-direction: column;
+}
+
+.navbar {
+  position: relative;        /* ✅ NOT fixed */
+  width: 100%;
+  height: 70px;
+  padding: 0 50px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #ffffff;
+  border-bottom: 1px solid #eaeaea;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  box-sizing: border-box;
+  border-radius: 0%;
+}
+
+
+/* LEFT */
+.navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo {
+  width: 42px;
+}
+
+.logo-text {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+/* CENTER */
+.navbar-links {
+  display: flex;
+  gap: 28px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.navbar-links li {
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* RIGHT */
+.profile-btn {
+  padding: 8px 18px;
+  background: #000;
+  color: #fff;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+}
+.hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: white;
+  padding: 80px 50px;
+  width: 100%;
+}
+
+
+.hero-text {
+  max-width: 520px;
+}
+
+.hero-text h1 {
+  font-size: 42px;
+  font-weight: 700;
+}
+
+.hero-text p {
+  margin-top: 16px;
+  font-size: 16px;
+  color: #555;
+}
+
+.highlight {
+  color: #000;
+}
+
+.hero-buttons {
+  margin-top: 30px;
+  display: flex;
+  gap: 16px;
+}
+
+.btn-primary {
+  padding: 12px 24px;
+  background: #000;
+  color: #fff;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-outline {
+  padding: 12px 24px;
+  background: transparent;
+  border: 1.5px solid #000;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.hero-image img {
+  width: 100%;
+  max-width: 420px;
+  height: auto;
+  display: block;
+}
+
+/* ===================== */
+/* HOW IT WORKS */
+/* ===================== */
+.howitworks {
+  padding: 70px 50px;
+  text-align: center;
+}
+
+.howitworks h2 {
+  font-size: 32px;
+  margin-bottom: 40px;
+  background-color: white;
+}
+
+.steps {
+  display: flex;
+  gap: 24px;
+  justify-content: space-between;
+}
+
+.step-card {
+  width: 23%;
+  background: #fff;
+  padding: 32px;
+  border-radius: 14px;
+  border: 1px solid #eee;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.step-card .icon {
+  font-size: 30px;
+  margin-bottom: 12px;
+}
+
+/* ===================== */
+/* RESPONSIVE */
+/* ===================== */
+@media (max-width: 900px) {
+  .navbar-links {
+    display: none;
+  }
+
+  .hero {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .hero-image img {
+    margin-top: 40px;
+  }
+
+  .steps {
+    flex-direction: column;
+  }
+
+  .step-card {
+    width: 100%;
+  }
+}

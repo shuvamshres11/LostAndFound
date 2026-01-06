@@ -1,0 +1,38 @@
+/* Reset some defaults */
+body, html, #root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  font-family: 'Poppins', sans-serif;
+  background-color: #ffffff;
+}
+
+/* Remove default focus outlines for cleaning UI */
+button, input {
+  font-family: inherit;
+  outline: none;
+}
+
+/* Smooth animations */
+* {
+  box-sizing: border-box;
+  transition: 0.2s ease-in-out;
+}
+#root {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.app-wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.page-content {
+  width: 100%;
+  padding: 40px 50px; /* Moves padding here instead of the whole page */
+  box-sizing: border-box;
+}

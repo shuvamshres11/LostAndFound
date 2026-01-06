@@ -1,0 +1,93 @@
+/* GLOBAL RESET */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
+/* MAIN CONTAINER */
+.verify-container {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  position: relative;
+}
+
+/* LEFT SIDE */
+.verify-left {
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+/* RIGHT SIDE */
+.verify-right {
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+/* DIVIDER */
+.verify-divider {
+  position: absolute;
+  left: 50%;
+  top: 10%;
+  height: 80%;
+  width: 1px;
+  background: #dcdcdc;
+}
+
+/* TITLE */
+.verify-title {
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+/* INPUT */
+.verify-input {
+  width: 65%;
+  padding: 14px 16px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+
+/* BUTTON */
+.verify-btn {
+  width: 65%;
+  padding: 14px;
+  background: #000;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* LOGO */
+.verify-logo {
+  width: 140px;
+  margin-bottom: 10px;
+}
+
+/* APP TITLE */
+.verify-app-title {
+  text-align: center;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 38px;
+}
+
+.verify-app-title span {
+  display: block;
+  font-size: 22px;
+  margin-top: 4px;
+  letter-spacing: 6px;
+}
