@@ -1,12 +1,14 @@
 import React from 'react';
 import Nav from './components/nav.jsx';
+import LandingNav from './components/LandingNav.jsx';
 import Footer from './components/footer'; // Import Footer
 import './about.css';
 
 const About = () => {
+  const user = JSON.parse(localStorage.getItem("user"));
   return (
     <div className="about-page-wrapper">
-      <Nav />
+      {user ? <Nav /> : <LandingNav />}
       <main className="about-content">
         <div className="about-text-column">
           <h1>About Lost & Found Tracker</h1>

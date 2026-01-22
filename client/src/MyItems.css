@@ -1,0 +1,159 @@
+.my-items-page {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: #f9fafb;
+}
+
+.my-items-container {
+    flex: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    width: 100%;
+}
+
+.my-items-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.my-items-header h1 {
+    font-size: 32px;
+    color: #111827;
+    margin-bottom: 10px;
+}
+
+.my-items-header p {
+    color: #6b7280;
+    font-size: 16px;
+}
+
+.section-title {
+    font-size: 24px;
+    color: #374151;
+    border-bottom: 2px solid #e5e7eb;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    margin-top: 40px;
+}
+
+.section-title:first-of-type {
+    margin-top: 0;
+}
+
+.items-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 25px;
+}
+
+.no-items-msg {
+    color: #9ca3af;
+    font-style: italic;
+    padding: 20px;
+    background: #fff;
+    border-radius: 8px;
+    text-align: center;
+    border: 1px dashed #e5e7eb;
+}
+
+/* Reusing card styles roughly but making sure they work here */
+.my-item-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
+}
+
+.my-item-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+}
+
+.my-item-image-wrapper {
+    position: relative;
+    height: 200px;
+    overflow: hidden;
+    background-color: #f3f4f6;
+    cursor: pointer;
+}
+
+.my-item-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.my-status-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: white;
+}
+
+.my-status-badge.lost {
+    background-color: #ef4444;
+    /* Red */
+}
+
+.my-status-badge.found {
+    background-color: #10b981;
+    /* Green */
+}
+
+.my-delete-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s;
+    font-size: 16px;
+}
+
+.my-delete-btn:hover {
+    background: #fee2e2;
+}
+
+.my-card-content {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1;
+}
+
+.my-card-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.my-card-date,
+.my-card-loc {
+    font-size: 14px;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}

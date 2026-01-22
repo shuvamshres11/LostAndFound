@@ -34,15 +34,43 @@ router.post('/', async (req, res) => {
 });
 
 // @route   GET /api/items
-// @desc    Get all items
+// @desc    Get all items (with optional filtering)
 // @access  Public
 router.get('/', async (req, res) => {
     try {
-        const items = await Item.find().sort({ createdAt: -1 }).populate('user', 'firstName lastName');
+        const { type, limit } = req.query;
+        let query = {};
+        if (type) query.type = type;
+
+        // If limit is provided, maybe we don't need the full image? 
+        // For now, let's just limit the number of documents.
+        // TODO: Ideally, implement pagination with skip/limit.
+
+        let findQuery = Item.find(query).sort({ createdAt: -1 }).populate('user', 'firstName lastName');
+
+        if (limit) {
+            findQuery = findQuery.limit(parseInt(limit));
+        }
+
+        const items = await findQuery;
         res.json(items);
     } catch (err) {
         console.error("Error fetching items:", err);
         res.status(500).json({ message: "Server Error fetching items." });
+    }
+});
+
+// @route   GET /api/items/:id
+// @desc    Get single item by ID
+// @access  Public
+router.get('/:id', async (req, res) => {
+    try {
+        const item = await Item.findById(req.params.id).populate('user', 'firstName lastName');
+        if (!item) return res.status(404).json({ message: "Item not found" });
+        res.json(item);
+    } catch (err) {
+        console.error("Error fetching item:", err);
+        res.status(500).json({ message: "Server Error fetching item." });
     }
 });
 

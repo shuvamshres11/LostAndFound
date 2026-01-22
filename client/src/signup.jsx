@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import emailjs from "@emailjs/browser";
+import { useToast } from "./components/ToastContext";
 import {
   setFullName,
   setEmail,
@@ -15,6 +16,7 @@ import logo from "./assets/lnf_logo.png";
 export default function Signup() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const { error, email, fullName } = useSelector((state) => state.signup);
   const [showPassword, setShowPassword] = useState(false); // Visibility state
   const [showConfirmPassword, setShowConfirmPassword] = useState(false); // Visibility state
@@ -49,7 +51,7 @@ export default function Signup() {
       })
       .catch((err) => {
         console.error("Failed to send email:", err);
-        alert("Check your console. EmailJS is reporting an error.");
+        showToast("Check your console. EmailJS is reporting an error.", "error");
       });
   };
 

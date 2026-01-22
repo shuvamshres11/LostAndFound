@@ -1,11 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useToast } from "./components/ToastContext";
+import { useNavigate } from "react-router-dom";
 import Nav from "./components/nav.jsx";
 import Footer from "./components/footer.jsx";
 import "./PostItem.css";
 
 export default function PostItem() {
+  const { showToast } = useToast();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("lost");
   const [imagePreview, setImagePreview] = useState(null);
+  const user = JSON.parse(localStorage.getItem("user")); // Move user retrieval up
+
+
+  // Removed useEffect redirect to allow showing UI instead
+
 
   const categories = [
     "Electronics", "Pets", "Wallets & Cards", "Keys",
@@ -31,7 +40,7 @@ export default function PostItem() {
     const file = e.target.files[0];
     if (file) {
       if (file.size > 10 * 1024 * 1024) {
-        alert("File size exceeds 10MB limit.");
+        showToast("File size exceeds 10MB limit.", "error");
         return;
       }
       const reader = new FileReader();
@@ -48,12 +57,13 @@ export default function PostItem() {
     // Check authentication
     const user = JSON.parse(localStorage.getItem("user"));
     if (!user) {
-      alert("You must be logged in to post.");
+      showToast("You must be logged in to post.", "error");
+      navigate("/login");
       return;
     }
 
     if (!imagePreview) {
-      alert("Please upload an image of the item.");
+      showToast("Please upload an image of the item.", "error");
       return;
     }
 
@@ -76,7 +86,7 @@ export default function PostItem() {
       });
 
       if (response.ok) {
-        alert("Post created successfully!");
+        showToast("Post created successfully!", "success");
         // Reset form
         setFormData({
           title: "",
@@ -88,14 +98,42 @@ export default function PostItem() {
         setImagePreview(null);
       } else {
         const errorData = await response.json();
-        alert("Failed to create post: " + errorData.message);
+        showToast("Failed to create post: " + errorData.message, "error");
       }
 
     } catch (error) {
       console.error("Error creating post:", error);
-      alert("Server error. Please try again.");
+      showToast("Server error. Please try again.", "error");
     }
   };
+
+  if (!user) {
+    return (
+      <div className="page-layout">
+        <Nav /> {/* This will likely be LandingNav in practice due to condition in App? Or just Nav with guest view? */}
+        {/* Actually, Nav usually checks user? No, Nav is generic. Wait, we want LandingNav if guest? */}
+        {/* Context says: "Conditionally render... Nav for authenticated, LandingNav for guests" */}
+        {/* But PostItem imports Nav directly. Let's swap it to use the same logic as others if needed, 
+                  OR just show the restricted access card inside the layout. 
+                  Let's replicate the layout wrapper. */}
+        <div className="nav-spacer"></div>
+        <main className="main-content-viewport" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
+          <div className="login-required-card" style={{ textAlign: 'center', padding: '2rem', background: 'white', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+            <h2>Login Required</h2>
+            <p style={{ margin: '1rem 0', color: '#666' }}>You need to be logged in to post lost or found items.</p>
+            <button
+              className="btn-primary"
+              onClick={() => navigate('/login')}
+              style={{ padding: '0.8rem 1.5rem', fontSize: '1rem', cursor: 'pointer', background: '#6c5ce7', color: 'white', border: 'none', borderRadius: '6px' }}
+            >
+              Go to Login
+            </button>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="page-layout">

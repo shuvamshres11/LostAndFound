@@ -23,8 +23,10 @@
   gap: 10px;
 }
 
-.logo-icon {
-  font-size: 26px;
+.nav-logo-img {
+  height: 40px;
+  width: auto;
+  object-fit: contain;
 }
 
 .logo-text {

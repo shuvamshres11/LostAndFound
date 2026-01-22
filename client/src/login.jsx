@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { useToast } from "./components/ToastContext";
 import "./login.css";
 import logo from "./assets/lnf_logo.png";
 
 const Login = () => {
   const navigate = useNavigate();
+  const { showToast } = useToast();
 
   // 1. Create state variables to hold the user's input
   // 1. Create state variables to hold the user's input
@@ -17,7 +19,7 @@ const Login = () => {
     e?.preventDefault(); // Prevent default from submission
     // Basic frontend check before sending to server
     if (!email || !password) {
-      alert("Please fill in all fields.");
+      showToast("Please fill in all fields.", "error");
       return;
     }
 
@@ -34,16 +36,16 @@ const Login = () => {
       if (response.ok) {
         // Success: Store user data and redirect
         localStorage.setItem("user", JSON.stringify(data.user));
-        alert("Welcome back!");
+        showToast("Welcome back!", "success");
         navigate("/home");
       } else {
         // Failure: Show the specific error message from the backend 
         // (e.g., "Account not found" or "Invalid password")
-        alert(data.message || "Login failed");
+        showToast(data.message || "Login failed", "error");
       }
     } catch (error) {
       console.error("Login error:", error);
-      alert(`Connection failed: ${error.message}. Check if server is running on port 5000.`);
+      showToast(`Connection failed: ${error.message}. Check if server is running on port 5000.`, "error");
     }
   };
 

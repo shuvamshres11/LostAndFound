@@ -1,20 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import Nav from './components/nav.jsx';
+import LandingNav from './components/LandingNav.jsx';
 import Footer from './components/footer.jsx';
+import { useToast } from "./components/ToastContext";
 import './lostitems.css';
 
 const LostItems = () => {
+  const { showToast } = useToast();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const currentUser = JSON.parse(localStorage.getItem("user"));
 
   const fetchItems = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/items');
+      // Fetch ONLY lost items from server
+      const response = await fetch('http://localhost:5000/api/items?type=lost');
       const data = await response.json();
-      // Filter for ONLY lost items
-      const lostItems = data.filter(item => item.type === 'lost');
-      setItems(lostItems);
+      setItems(data);
     } catch (error) {
       console.error("Error fetching items:", error);
     } finally {
@@ -40,21 +42,21 @@ const LostItems = () => {
       });
 
       if (response.ok) {
-        alert("Post deleted successfully.");
+        showToast("Post deleted successfully.", "success");
         fetchItems(); // Refresh list
       } else {
         const data = await response.json();
-        alert(data.message || "Failed to delete post.");
+        showToast(data.message || "Failed to delete post.", "error");
       }
     } catch (error) {
       console.error("Error deleting item:", error);
-      alert("Error deleting item.");
+      showToast("Error deleting item.", "error");
     }
   };
 
   return (
     <div className="full-page-wrapper">
-      <Nav />
+      {currentUser ? <Nav /> : <LandingNav />}
       <main className="content-container">
         <header className="page-header">
           <h1>Lost Items</h1>
@@ -69,7 +71,7 @@ const LostItems = () => {
           <div className="item-grid">
             {items.map((item) => (
               <div key={item._id} className="item-card">
-                <div className="image-container">
+                <div className="image-container" onClick={() => window.location.href = `/items/${item._id}`} style={{ cursor: 'pointer' }}>
                   <img src={item.image} alt={item.title} className="item-image" />
                   <span className="status-badge lost">Lost</span>
 
@@ -106,7 +108,19 @@ const LostItems = () => {
                     <span className="text">{new Date(item.date).toLocaleDateString()}</span>
                   </div>
 
-                  <button className="action-btn found-btn">I Found This</button>
+                  <button
+                    className="action-btn found-btn"
+                    onClick={() => {
+                      if (!currentUser) {
+                        showToast("Please login to report this.", "error");
+                        return;
+                      }
+                      const defaultMessage = `I have found your ${item.title}!`;
+                      window.location.href = `/chat?userId=${item.user._id}&message=${encodeURIComponent(defaultMessage)}`;
+                    }}
+                  >
+                    I Found This
+                  </button>
                 </div>
               </div>
             ))}

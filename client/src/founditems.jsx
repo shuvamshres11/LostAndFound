@@ -1,19 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import Nav from './components/nav.jsx';
+import LandingNav from './components/LandingNav.jsx';
 import Footer from './components/footer.jsx';
+import { useToast } from "./components/ToastContext";
 import './lostitems.css'; // Reusing the styled CSS
 
 const FoundItems = () => {
+  const { showToast } = useToast();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const currentUser = JSON.parse(localStorage.getItem("user"));
 
   const fetchItems = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/items');
+      const response = await fetch('http://localhost:5000/api/items?type=found');
       const data = await response.json();
-      const foundItems = data.filter(item => item.type === 'found');
-      setItems(foundItems);
+      setItems(data);
     } catch (error) {
       console.error("Error fetching items:", error);
     } finally {
@@ -38,7 +40,7 @@ const FoundItems = () => {
       });
 
       if (response.ok) {
-        alert("Post deleted successfully.");
+        showToast("Post deleted successfully.", "success");
         fetchItems();
       } else {
         const data = await response.json();
@@ -52,7 +54,7 @@ const FoundItems = () => {
 
   return (
     <div className="full-page-wrapper">
-      <Nav />
+      {currentUser ? <Nav /> : <LandingNav />}
       <main className="content-container">
         <header className="page-header">
           <h1>Found Items</h1>
@@ -67,7 +69,7 @@ const FoundItems = () => {
           <div className="item-grid">
             {items.map((item) => (
               <div key={item._id} className="item-card">
-                <div className="image-container">
+                <div className="image-container" onClick={() => window.location.href = `/items/${item._id}`} style={{ cursor: 'pointer' }}>
                   <img src={item.image} alt={item.title} className="item-image" />
                   <span className="status-badge found">Found</span>
 
@@ -104,7 +106,19 @@ const FoundItems = () => {
                     <span className="text">{new Date(item.date).toLocaleDateString()}</span>
                   </div>
 
-                  <button className="action-btn found-btn">Claim Item</button>
+                  <button
+                    className="action-btn found-btn"
+                    onClick={() => {
+                      if (!currentUser) {
+                        showToast("Please login to claim this item.", "error");
+                        return;
+                      }
+                      const defaultMessage = `I think this ${item.title} belongs to me.`;
+                      window.location.href = `/chat?userId=${item.user._id}&message=${encodeURIComponent(defaultMessage)}`;
+                    }}
+                  >
+                    Claim Item
+                  </button>
                 </div>
               </div>
             ))}

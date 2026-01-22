@@ -1,6 +1,8 @@
 import "./nav.css";
+import logo from "../assets/lnf_logo.png";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
+import socket from "../socket";
 
 const Nav = () => {
   const [open, setOpen] = useState(false);
@@ -11,8 +13,32 @@ const Nav = () => {
   const notificationRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
+  const currentUser = JSON.parse(localStorage.getItem("user"));
 
-  // Close dropdown when clicking outside
+  // Join User Room & Listen for Messages
+  useEffect(() => {
+    if (currentUser) {
+      socket.emit("join_room", currentUser.id || currentUser._id);
+
+      const handleReceiveMessage = (message) => {
+        // If on chat page, we might not want to increment (or let Chat handle it)
+        // But simple logic: increment badge.
+        // If we are on chat page and chatting with that user, maybe don't increment?
+        // For now, simple approach: always increment.
+        if (location.pathname !== '/chat') { // Basic check
+          setNotificationCount(prev => prev + 1);
+        }
+      };
+
+      socket.on("receive_message", handleReceiveMessage);
+
+      return () => {
+        socket.off("receive_message", handleReceiveMessage);
+      };
+    }
+  }, [currentUser, location.pathname]);
+
+
   // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -32,7 +58,20 @@ const Nav = () => {
   // Logout Logic
   const handleConfirmLogout = () => {
     setShowLogoutConfirm(false);
-    navigate("/login"); // Redirect to login page
+    localStorage.removeItem("user"); // Clear user
+    navigate("/"); // Redirect to landing page
+  };
+
+  const handleNotificationClick = () => {
+    setNotificationOpen(!notificationOpen);
+    if (notificationCount > 0) {
+      // If we click, we can either clear count or just show dropdown. 
+      // User asked "direct to the inbox when clicked".
+      // So if we click the ICON, we should probably toggle dropdown? 
+      // Or just go straight to chat?
+      // "whenever we get messege from someone it has to show in the notification (nav) and direct to the inbox when clicked"
+      // Let's make the notification ITEM clickable to go to chat.
+    }
   };
 
   return (
@@ -41,11 +80,13 @@ const Nav = () => {
         {/* Left: Logo */}
         <div className="nav-logo">
           <Link to="/home" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', color: 'inherit' }}>
-            <div className="logo-icon">🔍</div>
-            <div className="logo-text">
-              <span className="logo-title">LOST & FOUND</span>
-              <span className="logo-sub">TRACKER</span>
-            </div>
+            <Link to="/home" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', color: 'inherit' }}>
+              <img src={logo} alt="Lost & Found" className="nav-logo-img" />
+              <div className="logo-text">
+                <span className="logo-title">LOST & FOUND</span>
+                <span className="logo-sub">TRACKER</span>
+              </div>
+            </Link>
           </Link>
         </div>
 
@@ -64,7 +105,7 @@ const Nav = () => {
 
           {/* Notification Icon */}
           <div className="nav-notification" ref={notificationRef}>
-            <div className="notification-icon" onClick={() => setNotificationOpen(!notificationOpen)}>
+            <div className="notification-icon" onClick={handleNotificationClick}>
               {/* SVG Link/Bell Icon */}
               <svg
                 viewBox="0 0 24 24"
@@ -76,15 +117,20 @@ const Nav = () => {
               </svg>
 
               {/* Notification Badge */}
-              <span className="notification-badge">1</span>
+              {notificationCount > 0 && <span className="notification-badge">{notificationCount}</span>}
             </div>
 
             {notificationOpen && (
               <div className="notification-dropdown">
                 <div className="notification-header">Notifications</div>
                 <div className="notification-list">
-                  <div className="notification-item">No new notifications</div>
-                  {/* Example items can be added here */}
+                  {notificationCount > 0 ? (
+                    <div className="notification-item" onClick={() => { setNotificationCount(0); navigate('/chat'); }} style={{ cursor: 'pointer' }}>
+                      You have {notificationCount} new message(s). Click to view.
+                    </div>
+                  ) : (
+                    <div className="notification-item">No new notifications</div>
+                  )}
                 </div>
               </div>
             )}
@@ -93,13 +139,13 @@ const Nav = () => {
           {/* Profile Dropdown */}
           <div className="nav-profile" ref={dropdownRef}>
             <button className="profile-btn" onClick={() => setOpen(!open)}>
-              Profile
+              {currentUser?.firstName || "Profile"}
             </button>
 
             {open && (
               <div className="profile-dropdown">
                 <Link to="/edit-profile" onClick={closeDropdown}>Edit Profile</Link>
-                <Link to="/post-item" onClick={closeDropdown}>Post Items</Link>
+                <Link to="/my-items" onClick={closeDropdown}>My Items</Link>
                 <button
                   className="logout-btn"
                   onClick={() => { setShowLogoutConfirm(true); closeDropdown(); }}

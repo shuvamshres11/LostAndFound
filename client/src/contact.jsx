@@ -1,11 +1,16 @@
 import React, { useState } from 'react';
 import emailjs from '@emailjs/browser';
 import Nav from './components/nav.jsx';
+import LandingNav from './components/LandingNav.jsx';
 import Footer from './components/footer'; // Import Footer
+import { useToast } from "./components/ToastContext";
 import './contact.css';
 
 
 const Contact = () => {
+  const { showToast } = useToast();
+  const user = JSON.parse(localStorage.getItem("user"));
+
   // State to hold form values matching your EmailJS template tags
   const [formData, setFormData] = useState({
     name: '',
@@ -36,16 +41,16 @@ const Contact = () => {
       'P1xY_U1usE_RY1UA4'    // Replace with your Public Key from Account settings
     )
       .then((result) => {
-        alert("Success! Your message has been sent to shuvamshres11@gmail.com.");
+        showToast("Success! Your message has been sent.", "success");
         setFormData({ name: '', email: '', message: '' }); // Clear the form
       }, (error) => {
-        alert("Failed to send message: " + error.text);
+        showToast("Failed to send message: " + error.text, "error");
       });
   };
 
   return (
     <div className="contact-page-wrapper">
-      <Nav />
+      {user ? <Nav /> : <LandingNav />}
       <main className="contact-main">
         <header className="contact-header">
           <h1>Contact Us</h1>

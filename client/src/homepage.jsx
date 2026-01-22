@@ -1,10 +1,12 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import "./HomePage.css";
 import heroImage from "./assets/image.png";
 import Nav from "./components/nav";
 import Footer from "./components/footer";
 
 export default function HomePage() {
+  const navigate = useNavigate();
   return (
     <div className="homepage">
       {/* NAVBAR */}
@@ -24,8 +26,9 @@ export default function HomePage() {
           </p>
 
           <div className="hero-buttons">
-            <button className="btn-primary">Post a Lost Item</button>
-            <button className="btn-outline">View Matches</button>
+            <button className="btn-primary" onClick={() => navigate('/post-item')}>Post a Lost Item</button>
+            <button className="btn-primary" onClick={() => navigate('/lost-items')}>View Matches</button>
+            <button className="btn-primary" onClick={() => navigate('/chat')}>Messages</button>
           </div>
         </div>
 
