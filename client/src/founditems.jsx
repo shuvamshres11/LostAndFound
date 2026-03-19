@@ -13,7 +13,8 @@ const FoundItems = () => {
 
   const fetchItems = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/items?type=found');
+      // Fetch ONLY active found items from server
+      const response = await fetch('http://localhost:5000/api/items?type=found&status=active');
       const data = await response.json();
       setItems(data);
     } catch (error) {
@@ -88,7 +89,12 @@ const FoundItems = () => {
                 <div className="card-content">
                   <div className="title-row">
                     <h3>{item.title}</h3>
-                    <span className="item-id">#{item._id.slice(-6).toUpperCase()}</span>
+                    <div style={{display: 'flex', gap: '8px', alignItems: 'center'}}>
+                      <span className={`item-state-badge ${item.status || 'active'}`}>
+                        {item.status === 'completed' ? 'Completed' : 'Active'}
+                      </span>
+                      <span className="item-id">#{item._id.slice(-6).toUpperCase()}</span>
+                    </div>
                   </div>
 
                   {/* Author Name */}

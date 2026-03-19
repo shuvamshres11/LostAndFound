@@ -46,8 +46,8 @@
 .landing-logo-sub {
     font-size: 10px;
     font-weight: 600;
-    color: #3b82f6;
-    /* Accent blue */
+    color: #000;
+    /* Changed to black */
     letter-spacing: 2px;
     text-transform: uppercase;
 }

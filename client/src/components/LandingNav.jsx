@@ -17,13 +17,11 @@ const LandingNav = () => {
             {/* Left: Logo */}
             <div className="landing-nav-logo">
                 <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', color: 'inherit' }}>
-                    <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', color: 'inherit' }}>
-                        <img src={logo} alt="Lost & Found" className="landing-logo-img" />
-                        <div className="landing-logo-text">
-                            <span className="landing-logo-title">LOST & FOUND</span>
-                            <span className="landing-logo-sub">TRACKER</span>
-                        </div>
-                    </Link>
+                    <img src={logo} alt="Lost & Found" className="landing-logo-img" />
+                    <div className="landing-logo-text">
+                        <span className="landing-logo-title">LOST & FOUND</span>
+                        <span className="landing-logo-sub">TRACKER</span>
+                    </div>
                 </Link>
             </div>
 

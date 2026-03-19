@@ -12,7 +12,8 @@ router.get('/history/:user1/:user2', async (req, res) => {
             $or: [
                 { sender: user1, receiver: user2 },
                 { sender: user2, receiver: user1 }
-            ]
+            ],
+            deletedBy: { $ne: user1 }
         }).sort({ timestamp: 1 }); // Oldest first
 
         res.json(messages);
@@ -26,9 +27,10 @@ router.get('/conversations/:userId', async (req, res) => {
     try {
         const { userId } = req.params;
 
-        // Find all messages where the user is sender or receiver
+        // Find all messages where the user is sender or receiver and NOT deleted by them
         const messages = await Message.find({
-            $or: [{ sender: userId }, { receiver: userId }]
+            $or: [{ sender: userId }, { receiver: userId }],
+            deletedBy: { $ne: userId }
         });
 
         // Extract unique user IDs
@@ -41,9 +43,59 @@ router.get('/conversations/:userId', async (req, res) => {
         // Convert Set to Array and fetch user details
         const users = await User.find({ _id: { $in: Array.from(userIds) } }).select('firstName lastName profilePicture');
 
-        res.json(users);
+        // Calculate unread count for each user
+        const conversationsWithUnread = await Promise.all(users.map(async (user) => {
+            const unreadCount = await Message.countDocuments({
+                sender: user._id,
+                receiver: userId,
+                isRead: false
+            });
+            return {
+                ...user.toObject(),
+                unreadCount
+            };
+        }));
+
+        res.json(conversationsWithUnread);
     } catch (err) {
         res.status(500).json({ message: "Error fetching conversations" });
+    }
+});
+
+// Mark messages as read between two users
+router.post('/mark-read', async (req, res) => {
+    try {
+        const { sender, receiver } = req.body; // sender is the current user (who read messages), receiver is the one who sent them
+
+        await Message.updateMany(
+            { sender: receiver, receiver: sender, isRead: false },
+            { $set: { isRead: true } }
+        );
+
+        res.json({ success: true, message: "Messages marked as read" });
+    } catch (err) {
+        res.status(500).json({ message: "Error marking messages as read" });
+    }
+});
+
+// Delete conversation (One-sided)
+router.post('/delete-conversation', async (req, res) => {
+    try {
+        const { myId, otherId } = req.body;
+
+        await Message.updateMany(
+            {
+                $or: [
+                    { sender: myId, receiver: otherId },
+                    { sender: otherId, receiver: myId }
+                ]
+            },
+            { $addToSet: { deletedBy: myId } }
+        );
+
+        res.json({ success: true, message: "Conversation deleted" });
+    } catch (err) {
+        res.status(500).json({ message: "Error deleting conversation" });
     }
 });
 

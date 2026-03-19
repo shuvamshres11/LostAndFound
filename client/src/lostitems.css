@@ -109,7 +109,27 @@
   font-size: 0.75rem;
   font-weight: 600;
   white-space: nowrap;
-  margin-left: 10px;
+}
+
+.item-state-badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.item-state-badge.active {
+  background-color: #dbeafe;
+  color: #1e3a8a;
+  border: 1px solid #bfdbfe;
+}
+
+.item-state-badge.completed {
+  background-color: #d1fae5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
 }
 
 .info-row {

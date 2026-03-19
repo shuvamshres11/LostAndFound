@@ -26,7 +26,7 @@ export default function HomePage() {
           </p>
 
           <div className="hero-buttons">
-            <button className="btn-primary" onClick={() => navigate('/post-item')}>Post a Lost Item</button>
+            <button className="btn-primary" onClick={() => navigate('/post-item')}>Post an Item</button>
             <button className="btn-primary" onClick={() => navigate('/lost-items')}>View Matches</button>
             <button className="btn-primary" onClick={() => navigate('/chat')}>Messages</button>
           </div>

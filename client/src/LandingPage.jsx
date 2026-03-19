@@ -32,7 +32,7 @@ export default function LandingPage() {
                     </p>
 
                     <div className="hero-buttons">
-                        <button className="btn-primary" onClick={handleActionClick}>Post a Lost Item</button>
+                        <button className="btn-primary" onClick={handleActionClick}>Post an Item</button>
                         <button className="btn-outline" onClick={handleActionClick}>View Matches</button>
                         <button className="btn-outline" onClick={handleActionClick}>Messages</button>
                     </div>

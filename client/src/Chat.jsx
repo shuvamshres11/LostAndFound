@@ -21,7 +21,72 @@ const Chat = () => {
     const [activeChat, setActiveChat] = useState(null); // The user object we are chatting with
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState(initialMessage || ""); // Set initial message
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [chatToDelete, setChatToDelete] = useState(null);
     const messagesEndRef = useRef(null);
+    const messagesContainerRef = useRef(null);
+
+    const fetchConversations = async () => {
+        try {
+            const userId = currentUser.id || currentUser._id;
+            const res = await fetch(`http://localhost:5000/api/chat/conversations/${userId}`);
+            const data = await res.json();
+            setConversations(data);
+        } catch (err) {
+            console.error("Error fetching conversations:", err);
+        }
+    };
+
+    const markMessagesAsRead = async (senderId) => {
+        try {
+            const myId = currentUser.id || currentUser._id;
+            await fetch("http://localhost:5000/api/chat/mark-read", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ sender: myId, receiver: senderId }),
+            });
+            // Update local state to remove badge
+            setConversations(prev => prev.map(conv =>
+                conv._id === senderId ? { ...conv, unreadCount: 0 } : conv
+            ));
+        } catch (err) {
+            console.error("Error marking messages as read:", err);
+        }
+    };
+
+    const fetchHistory = async (otherUserId) => {
+        try {
+            const myId = currentUser.id || currentUser._id;
+            const res = await fetch(`http://localhost:5000/api/chat/history/${myId}/${otherUserId}`);
+            const data = await res.json();
+            setMessages(data);
+        } catch (err) {
+            console.error("Error fetching history:", err);
+        }
+    };
+
+    const startChatWithUser = async (userId) => {
+        try {
+            const res = await fetch(`http://localhost:5000/api/auth/profile/${userId}`);
+            const user = await res.json();
+            setActiveChat(user);
+            fetchHistory(user._id);
+        } catch (err) {
+            console.error("Error fetching user details:", err);
+        }
+    };
+
+    const sendMessage = async () => {
+        if (newMessage.trim() === "") return;
+        const messageData = {
+            sender: currentUser.id || currentUser._id,
+            receiver: activeChat._id,
+            content: newMessage,
+            itemId: null
+        };
+        await socket.emit("send_message", messageData);
+        setNewMessage("");
+    };
 
     useEffect(() => {
         if (!currentUser) {
@@ -41,10 +106,17 @@ const Chat = () => {
 
         // Handle Incoming Messages
         const handleReceiveMessage = (message) => {
-            // Only update if message belongs to active chat
+            // If message belongs to active chat, append it
             if (activeChat && (message.sender === activeChat._id || message.receiver === activeChat._id)) {
                 setMessages((prev) => [...prev, message]);
+
+                // If the message is from the active user, mark it as read immediately
+                if (message.sender === activeChat._id) {
+                    markMessagesAsRead(activeChat._id);
+                }
             }
+
+            // Always refresh conversations to update unread counts and last message order
             fetchConversations();
         };
 
@@ -53,69 +125,68 @@ const Chat = () => {
         return () => {
             socket.off("receive_message", handleReceiveMessage);
         };
-    }, [currentUser, activeChat]); // Logic still depends on activeChat for the filter inside logic.
-    // Better pattern: Filter inside setMessages or use a Ref for activeChatId
-
-    // We can simplify: just append message. User will see red dot if not active? 
-    // The Nav handles badge. Here we just show.
-    // Ideally we shouldn't rely on `activeChat` in dependency array for listener.
-    // Let's us Ref for `activeChat`.
+    }, [currentUser, activeChat]);
 
 
-    // Removed auto-scroll to prevent unwanted scrolling when sending messages
-    // Users can manually scroll to see new messages
 
-    const fetchConversations = async () => {
-        try {
-            const userId = currentUser.id || currentUser._id;
-            const res = await fetch(`http://localhost:5000/api/chat/conversations/${userId}`);
-            const data = await res.json();
-            setConversations(data);
-        } catch (err) {
-            console.error("Error fetching conversations:", err);
+    const handleConversationClick = (user) => {
+        setActiveChat(user);
+        fetchHistory(user._id);
+        if (user.unreadCount > 0) {
+            markMessagesAsRead(user._id);
         }
     };
 
-    const startChatWithUser = async (userId) => {
-        // 1. Get user details (if not already in list)
-        // For now, we assume we might need to fetch it if it's not in conversations
-        // BUT, let's just fetch the profile to be sure
-        try {
-            const res = await fetch(`http://localhost:5000/api/auth/profile/${userId}`);
-            const user = await res.json();
-            setActiveChat(user);
-
-            // 2. Fetch history
-            fetchHistory(user._id);
-        } catch (err) {
-            console.error("Error fetching user details:", err);
+    // Auto-scroll to bottom when messages change
+    useEffect(() => {
+        if (messagesContainerRef.current) {
+            const { scrollHeight, clientHeight } = messagesContainerRef.current;
+            messagesContainerRef.current.scrollTo({
+                top: scrollHeight - clientHeight,
+                behavior: 'smooth'
+            });
         }
+    }, [messages]);
+
+
+
+    const handleDeleteChat = (e, userId) => {
+        e?.stopPropagation();
+        setChatToDelete(userId);
+        setShowDeleteModal(true);
     };
 
-    const fetchHistory = async (otherUserId) => {
+    const confirmDeleteChat = async () => {
+        if (!chatToDelete) return;
+
         try {
             const myId = currentUser.id || currentUser._id;
-            const res = await fetch(`http://localhost:5000/api/chat/history/${myId}/${otherUserId}`);
+            const res = await fetch("http://localhost:5000/api/chat/delete-conversation", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ myId, otherId: chatToDelete }),
+            });
+
             const data = await res.json();
-            setMessages(data);
+            if (data.success) {
+                // Remove conversation from state
+                setConversations(prev => prev.filter(c => c._id !== chatToDelete));
+                // If the deleted chat was active, clear it
+                if (activeChat && activeChat._id === chatToDelete) {
+                    setActiveChat(null);
+                    setMessages([]);
+                }
+                showToast("Conversation deleted", "success");
+            } else {
+                showToast("Failed to delete conversation", "error");
+            }
         } catch (err) {
-            console.error("Error fetching history:", err);
+            console.error("Error deleting conversation:", err);
+            showToast("Error deleting conversation", "error");
+        } finally {
+            setShowDeleteModal(false);
+            setChatToDelete(null);
         }
-    };
-
-    const sendMessage = async () => {
-        if (newMessage.trim() === "") return;
-
-        const messageData = {
-            sender: currentUser.id || currentUser._id,
-            receiver: activeChat._id,
-            content: newMessage,
-            itemId: null // For now, we don't strictly link to item in DB for every message
-        };
-
-        await socket.emit("send_message", messageData);
-        setMessages((prev) => [...prev, { ...messageData, timestamp: Date.now() }]); // Optimistic update
-        setNewMessage("");
     };
 
     return (
@@ -130,10 +201,23 @@ const Chat = () => {
                             <div
                                 key={user._id}
                                 className={`conversation-item ${activeChat?._id === user._id ? 'active' : ''}`}
-                                onClick={() => { setActiveChat(user); fetchHistory(user._id); }}
+                                onClick={() => handleConversationClick(user)}
                             >
                                 <div className="avatar">
-                                    {user.firstName[0]}
+                                    {user.profilePicture ? (
+                                        <img
+                                            src={user.profilePicture}
+                                            alt={`${user.firstName} ${user.lastName}`}
+                                            className="avatar-img"
+                                        />
+                                    ) : (
+                                        <span className="avatar-initial">{user.firstName[0]}</span>
+                                    )}
+                                    {user.unreadCount > 0 && (
+                                        <span className="notification-badge">
+                                            {user.unreadCount > 9 ? '9+' : user.unreadCount}
+                                        </span>
+                                    )}
                                 </div>
                                 <div className="info">
                                     <h4>{user.firstName} {user.lastName}</h4>
@@ -148,8 +232,18 @@ const Chat = () => {
                         <>
                             <div className="chat-header">
                                 <h4>{activeChat.firstName} {activeChat.lastName}</h4>
+                                <button
+                                    className="header-delete-btn"
+                                    onClick={(e) => handleDeleteChat(e, activeChat._id)}
+                                    title="Delete conversation"
+                                >
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <polyline points="3 6 5 6 21 6"></polyline>
+                                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                    </svg>
+                                </button>
                             </div>
-                            <div className="messages-area">
+                            <div className="messages-area" ref={messagesContainerRef}>
                                 {messages.map((msg, index) => {
                                     const isMe = msg.sender === (currentUser.id || currentUser._id);
                                     return (
@@ -180,6 +274,20 @@ const Chat = () => {
                 </div>
             </div>
             <Footer />
+
+            {/* Delete Confirmation Modal */}
+            {showDeleteModal && (
+                <div className="delete-modal-overlay">
+                    <div className="delete-modal-content">
+                        <h3>Delete Conversation?</h3>
+                        <p>This conversation will be permanently removed from your view. The other person will still see the history.</p>
+                        <div className="delete-modal-actions">
+                            <button className="delete-modal-btn cancel" onClick={() => setShowDeleteModal(false)}>Cancel</button>
+                            <button className="delete-modal-btn confirm" onClick={confirmDeleteChat}>Delete</button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

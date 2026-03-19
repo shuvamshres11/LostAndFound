@@ -21,19 +21,28 @@ app.use(express.json({ limit: "10mb" })); // Increased limit for Base64 images
 app.use(express.urlencoded({ limit: "10mb", extended: true }));
 app.use(cors()); // This lets your React app talk to this server
 
+// Make io accessible to our routers
+app.use((req, res, next) => {
+  req.io = io;
+  next();
+});
+
 // Use the routes we created
 app.use('/api/auth', require('./routes/auth'));
-app.use('/api/items', require('./routes/items')); // Register Item Routes
-app.use('/api/chat', require('./routes/chat')); // Register Chat Routes
+app.use('/api/items', require('./routes/items'));
+app.use('/api/chat', require('./routes/chat'));
+app.use('/api/admin', require('./routes/admin'));
+
+app.use('/api/notifications', require('./routes/notifications')); // Register Notification Routes
 
 // --- SOCKET.IO LOGIC ---
 io.on("connection", (socket) => {
-  console.log(`User Connected: ${socket.id}`);
+  // console.log(`User Connected: ${socket.id}`);
 
   // User joins a room identified by their User ID (so they can receive private messages)
   socket.on("join_room", (userId) => {
     socket.join(userId);
-    console.log(`User with ID: ${userId} joined room: ${userId}`);
+    // console.log(`User with ID: ${userId} joined room: ${userId}`);
   });
 
   // Send Message Event
@@ -51,22 +60,19 @@ io.on("connection", (socket) => {
       });
       await newMessage.save();
 
-      // Emit to receiver's room
-      // We emit the full message object so the frontend can display it immediately
+      // Emit to receiver's room and sender's room
       io.to(data.receiver).emit("receive_message", newMessage);
-
-      // Also emit back to sender (optional, but good for confirmation or multi-device sync)
-      // io.to(data.sender).emit("receive_message", newMessage); 
-
+      io.to(data.sender).emit("receive_message", newMessage); // also to sender logic if needed
     } catch (err) {
       console.error("Error saving message:", err);
     }
   });
 
   socket.on("disconnect", () => {
-    console.log("User Disconnected", socket.id);
+    // console.log("User Disconnected", socket.id);
   });
 });
+
 
 // Connect to MongoDB (We will get this link in the next step)
 mongoose.connect(process.env.MONGO_URI)

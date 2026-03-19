@@ -37,7 +37,13 @@ const Login = () => {
         // Success: Store user data and redirect
         localStorage.setItem("user", JSON.stringify(data.user));
         showToast("Welcome back!", "success");
-        navigate("/home");
+
+        // Redirect based on user role
+        if (data.user.role === 'admin') {
+          navigate("/admin");
+        } else {
+          navigate("/home");
+        }
       } else {
         // Failure: Show the specific error message from the backend 
         // (e.g., "Account not found" or "Invalid password")
@@ -69,6 +75,18 @@ const Login = () => {
 
       {/* Right Side */}
       <form className="right-side" onSubmit={handleLogin}>
+        <button
+          type="button"
+          className="back-btn"
+          onClick={() => navigate(-1)}
+          aria-label="Go back"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          Back
+        </button>
         <h2 className="form-title">Login</h2>
 
         <div className="input-box">

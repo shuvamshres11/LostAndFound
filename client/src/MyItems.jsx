@@ -36,6 +36,30 @@ const MyItems = () => {
         fetchItems();
     }, [currentUser]); // Add currentUser dependency
 
+    const handleStatusToggle = async (itemId, currentStatus) => {
+        const newStatus = currentStatus === 'active' ? 'completed' : 'active';
+        try {
+            const userId = currentUser.id || currentUser._id;
+            const response = await fetch(`http://localhost:5000/api/items/${itemId}/status`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ userId, status: newStatus }),
+            });
+
+            if (response.ok) {
+                setItems(prevItems => prevItems.map(item => 
+                    item._id === itemId ? { ...item, status: newStatus } : item
+                ));
+            } else {
+                const data = await response.json();
+                alert(data.message || "Failed to update status.");
+            }
+        } catch (error) {
+            console.error("Error updating status:", error);
+            alert("Error updating status.");
+        }
+    };
+
     const handleDelete = async (itemId) => {
         if (!window.confirm("Are you sure you want to delete this post?")) return;
 
@@ -84,7 +108,7 @@ const MyItems = () => {
                         ) : (
                             <div className="items-grid">
                                 {lostItems.map(item => (
-                                    <ItemCard key={item._id} item={item} handleDelete={handleDelete} badgeClass="lost" badgeText="Lost" />
+                                    <ItemCard key={item._id} item={item} handleDelete={handleDelete} handleStatusToggle={handleStatusToggle} badgeClass="lost" badgeText="Lost" />
                                 ))}
                             </div>
                         )}
@@ -96,7 +120,7 @@ const MyItems = () => {
                         ) : (
                             <div className="items-grid">
                                 {foundItems.map(item => (
-                                    <ItemCard key={item._id} item={item} handleDelete={handleDelete} badgeClass="found" badgeText="Found" />
+                                    <ItemCard key={item._id} item={item} handleDelete={handleDelete} handleStatusToggle={handleStatusToggle} badgeClass="found" badgeText="Found" />
                                 ))}
                             </div>
                         )}
@@ -108,12 +132,14 @@ const MyItems = () => {
     );
 };
 
-const ItemCard = ({ item, handleDelete, badgeClass, badgeText }) => {
+const ItemCard = ({ item, handleDelete, handleStatusToggle, badgeClass, badgeText }) => {
+    const isCompleted = item.status === 'completed';
     return (
-        <div className="my-item-card">
+        <div className={`my-item-card ${isCompleted ? 'completed-card' : ''}`}>
             <div className="my-item-image-wrapper" onClick={() => window.location.href = `/items/${item._id}`}>
                 <img src={item.image} alt={item.title} className="my-item-image" />
                 <span className={`my-status-badge ${badgeClass}`}>{badgeText}</span>
+                {isCompleted && <span className="my-completion-badge">Completed</span>}
                 <button
                     className="my-delete-btn"
                     onClick={(e) => { e.stopPropagation(); handleDelete(item._id); }}
@@ -130,6 +156,12 @@ const ItemCard = ({ item, handleDelete, badgeClass, badgeText }) => {
                 <div className="my-card-loc">
                     <span>📍</span> {item.location || "No location"}
                 </div>
+                <button 
+                    className={`status-toggle-btn ${isCompleted ? 'mark-active' : 'mark-completed'}`}
+                    onClick={(e) => { e.stopPropagation(); handleStatusToggle(item._id, item.status || 'active'); }}
+                >
+                    {isCompleted ? 'Reopen Post' : 'Mark as Completed'}
+                </button>
             </div>
         </div>
     );

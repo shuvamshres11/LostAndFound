@@ -19,6 +19,10 @@ import Chat from "./Chat.jsx"; // ✅ ADD THIS
 import { ToastProvider } from "./components/ToastContext.jsx";
 import LandingPage from "./LandingPage.jsx";
 import MyItems from "./MyItems.jsx";
+import AdminDashboard from "./admin/AdminDashboard.jsx";
+import ManageUsers from "./admin/ManageUsers.jsx";
+import ManagePosts from "./admin/ManagePosts.jsx";
+import AllPosts from "./admin/AllPosts.jsx";
 
 export default function App() {
   return (
@@ -47,6 +51,12 @@ export default function App() {
           <Route path="/items/:id" element={<ItemDetails />} />
           <Route path="/chat" element={<Chat />} />
           <Route path="/my-items" element={<MyItems />} />
+
+          {/* Admin Routes */}
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/admin/users" element={<ManageUsers />} />
+          <Route path="/admin/posts" element={<ManagePosts />} />
+          <Route path="/admin/all-posts" element={<AllPosts />} />
         </Routes>
       </BrowserRouter>
     </ToastProvider>

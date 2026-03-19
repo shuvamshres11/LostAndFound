@@ -38,9 +38,13 @@ router.post('/', async (req, res) => {
 // @access  Public
 router.get('/', async (req, res) => {
     try {
-        const { type, limit } = req.query;
+        const { type, limit, status, search } = req.query;
         let query = {};
         if (type) query.type = type;
+        if (status) query.status = status;
+        if (search) {
+            query.title = { $regex: search, $options: 'i' };
+        }
 
         // If limit is provided, maybe we don't need the full image? 
         // For now, let's just limit the number of documents.
@@ -96,6 +100,36 @@ router.delete('/:id', async (req, res) => {
     } catch (err) {
         console.error("Error deleting item:", err);
         res.status(500).json({ message: "Server Error deleting item." });
+    }
+});
+
+// @route   PATCH /api/items/:id/status
+// @desc    Update item status
+// @access  Public (protected by user check check manually)
+router.patch('/:id/status', async (req, res) => {
+    try {
+        const item = await Item.findById(req.params.id);
+        const { userId, status } = req.body;
+
+        if (!item) {
+            return res.status(404).json({ message: "Item not found" });
+        }
+
+        // Check if the user updating is the owner
+        if (item.user.toString() !== userId) {
+            return res.status(401).json({ message: "Not authorized to update this post's status" });
+        }
+
+        if (!['active', 'completed'].includes(status)) {
+            return res.status(400).json({ message: "Invalid status value" });
+        }
+
+        item.status = status;
+        const updatedItem = await item.save();
+        res.json(updatedItem);
+    } catch (err) {
+        console.error("Error updating item status:", err);
+        res.status(500).json({ message: "Server Error updating item status." });
     }
 });
 

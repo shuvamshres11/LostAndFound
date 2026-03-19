@@ -38,7 +38,7 @@ const ItemSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['active', 'resolved'],
+        enum: ['active', 'completed'],
         default: 'active'
     },
     // Field for future CLIP embeddings
