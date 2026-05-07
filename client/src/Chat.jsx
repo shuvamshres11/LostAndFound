@@ -32,7 +32,7 @@ const Chat = () => {
     const fetchConversations = async () => {
         try {
             const userId = currentUser.id || currentUser._id;
-            const res = await fetch(`http://localhost:5000/api/chat/conversations/${userId}`);
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/chat/conversations/${userId}`);
             const data = await res.json();
             setConversations(data);
         } catch (err) {
@@ -43,7 +43,7 @@ const Chat = () => {
     const markMessagesAsRead = async (senderId) => {
         try {
             const myId = currentUser.id || currentUser._id;
-            await fetch("http://localhost:5000/api/chat/mark-read", {
+            await fetch(`${import.meta.env.VITE_API_URL}/chat/mark-read`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ sender: myId, receiver: senderId }),
@@ -60,7 +60,7 @@ const Chat = () => {
     const fetchHistory = async (otherUserId) => {
         try {
             const myId = currentUser.id || currentUser._id;
-            const res = await fetch(`http://localhost:5000/api/chat/history/${myId}/${otherUserId}`);
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/chat/history/${myId}/${otherUserId}`);
             const data = await res.json();
             setMessages(data);
         } catch (err) {
@@ -70,7 +70,7 @@ const Chat = () => {
 
     const startChatWithUser = async (userId) => {
         try {
-            const res = await fetch(`http://localhost:5000/api/auth/profile/${userId}`);
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/profile/${userId}`);
             const user = await res.json();
             setActiveChat(user);
             fetchHistory(user._id);
@@ -182,7 +182,7 @@ const Chat = () => {
 
         try {
             const myId = currentUser.id || currentUser._id;
-            const res = await fetch("http://localhost:5000/api/chat/delete-conversation", {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/chat/delete-conversation`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ myId, otherId: chatToDelete }),

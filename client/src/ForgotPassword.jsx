@@ -15,7 +15,7 @@ export default function ForgotPassword() {
 
         try {
             // 1. Check if email exists in backend
-            const response = await fetch("http://localhost:5000/api/auth/check-email", {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/check-email`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email }),

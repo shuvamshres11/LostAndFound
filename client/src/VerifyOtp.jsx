@@ -27,7 +27,7 @@ export default function VerifyOtp() {
         const lastName = nameParts.slice(1).join(" ") || "";
 
         // 2. If OTP is correct, send the registration data to the Express backend
-        const response = await fetch("http://localhost:5000/api/auth/signup", {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/signup`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email, password, firstName, lastName }),

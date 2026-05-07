@@ -4,7 +4,8 @@ const Item = require('../models/Item');
 // Internal fetch wrapper for getting embedding from python microservice
 const getEmbedding = async (base64Image) => {
     try {
-        const response = await fetch('http://127.0.0.1:8000/embed', {
+        const aiUrl = process.env.AI_SERVICE_URL || 'http://127.0.0.1:8000';
+        const response = await fetch(`${aiUrl}/embed`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

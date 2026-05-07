@@ -29,7 +29,7 @@ const ManagePosts = () => {
     const fetchPosts = async () => {
         try {
             const userId = currentUser?._id || currentUser?.id;
-            const res = await fetch('http://localhost:5000/api/admin/posts?limit=100', { 
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/admin/posts?limit=100`, { 
                 headers: { 'x-user-id': userId }
             });
             if (res.ok) {
@@ -53,7 +53,7 @@ const ManagePosts = () => {
     const openPostDetails = async (post) => {
         try {
             const userId = currentUser?._id || currentUser?.id;
-            const res = await fetch(`http://localhost:5000/api/admin/posts/${post._id}`, {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/admin/posts/${post._id}`, {
                 headers: { 'x-user-id': userId }
             });
             if (res.ok) {
@@ -76,7 +76,7 @@ const ManagePosts = () => {
 
         try {
             const userId = currentUser?._id || currentUser?.id;
-            const res = await fetch(`http://localhost:5000/api/admin/posts/${postToDelete._id}`, {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/admin/posts/${postToDelete._id}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',

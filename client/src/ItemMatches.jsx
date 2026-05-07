@@ -21,7 +21,7 @@ const ItemMatches = () => {
 
     const fetchSpecificMatches = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/matches/item/${itemId}`);
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/matches/item/${itemId}`);
         if (!response.ok) throw new Error("Failed to fetch matches for this item");
         const json = await response.json();
         setData(json);

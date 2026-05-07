@@ -27,7 +27,7 @@ const ManageUsers = () => {
     const fetchUsers = async () => {
         try {
             const userId = currentUser?._id || currentUser?.id;
-            const res = await fetch('http://localhost:5000/api/admin/users', {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/admin/users`, {
                 headers: { 'x-user-id': userId }
             });
             if (res.ok) setUsers(await res.json());
@@ -42,7 +42,7 @@ const ManageUsers = () => {
         if (!window.confirm("Are you sure you want to ban/delete this user?")) return;
         try {
             const userId = currentUser?._id || currentUser?.id;
-            const res = await fetch(`http://localhost:5000/api/admin/users/${id}`, {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/admin/users/${id}`, {
                 method: 'DELETE',
                 headers: { 'x-user-id': userId }
             });
@@ -70,7 +70,7 @@ const ManageUsers = () => {
         }
         try {
             const userId = currentUser?._id || currentUser?.id;
-            const res = await fetch(`http://localhost:5000/api/admin/users/${userToWarn._id}/warning`, {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/admin/users/${userToWarn._id}/warning`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'x-user-id': userId },
                 body: JSON.stringify({ message: warningMessage })

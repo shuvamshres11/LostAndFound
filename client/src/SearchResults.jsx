@@ -20,8 +20,8 @@ const SearchResults = () => {
     try {
       // If there's a search query, fetch with search param, else fetch all active items
       const url = query
-        ? `http://localhost:5000/api/items?search=${encodeURIComponent(query)}&status=active`
-        : `http://localhost:5000/api/items?status=active`;
+        ? `${import.meta.env.VITE_API_URL}/items?search=${encodeURIComponent(query)}&status=active`
+        : `${import.meta.env.VITE_API_URL}/items?status=active`;
 
       const response = await fetch(url);
       let data = await response.json();
@@ -49,7 +49,7 @@ const SearchResults = () => {
 
     try {
       const userId = currentUser.id || currentUser._id;
-      const response = await fetch(`http://localhost:5000/api/items/${itemId}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/items/${itemId}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId }),

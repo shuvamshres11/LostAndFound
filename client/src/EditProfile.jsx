@@ -35,7 +35,7 @@ const EditProfile = () => {
                 setUserId(userObj.id);
 
                 // Fetch latest data from backend
-                const response = await fetch(`http://localhost:5000/api/auth/profile/${userObj.id}`);
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/profile/${userObj.id}`);
                 console.log("Profile Fetch Response Status:", response.status); // DEBUG LOG
 
                 if (response.ok) {
@@ -87,7 +87,7 @@ const EditProfile = () => {
     const handleSave = async () => {
         setSaving(true);
         try {
-            const response = await fetch(`http://localhost:5000/api/auth/profile/${userId}`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/profile/${userId}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(formData),

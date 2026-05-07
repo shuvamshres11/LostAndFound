@@ -28,7 +28,7 @@ const Nav = () => {
       // Fetch existing system notifications ONLY on mount or user change
       // We essentially want this to be a separate effect or handled carefully.
       // But keeping it here is fine if dependencies are stable.
-      fetch(`http://localhost:5000/api/notifications/${userId}`)
+      fetch(`${import.meta.env.VITE_API_URL}/notifications/${userId}`)
         .then(res => res.json())
         .then(data => {
           setNotifications(data);
@@ -42,7 +42,7 @@ const Nav = () => {
         // Only increment if we are NOT on the chat page
         if (location.pathname !== '/chat') {
           try {
-            const res = await fetch(`http://localhost:5000/api/auth/profile/${message.sender}`);
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/profile/${message.sender}`);
             const senderUser = await res.json();
             
             const newMessageNotification = {
@@ -122,7 +122,7 @@ const Nav = () => {
     if (!notification.isRead) {
       try {
         // Mark as read in backend
-        await fetch(`http://localhost:5000/api/notifications/${notification._id}/read`, {
+        await fetch(`${import.meta.env.VITE_API_URL}/notifications/${notification._id}/read`, {
           method: 'PUT'
         });
 
@@ -146,7 +146,7 @@ const Nav = () => {
     try {
       if (!userId) return;
 
-      await fetch(`http://localhost:5000/api/notifications/${userId}/read-all`, {
+      await fetch(`${import.meta.env.VITE_API_URL}/notifications/${userId}/read-all`, {
         method: 'PUT'
       });
 

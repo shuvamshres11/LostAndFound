@@ -13,7 +13,7 @@ const MyItems = () => {
         try {
             if (!currentUser) return; // Should be handled by protecting route, but safe check
 
-            const response = await fetch('http://localhost:5000/api/items');
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/items`);
             const data = await response.json();
 
             // Filter for current user
@@ -40,7 +40,7 @@ const MyItems = () => {
         const newStatus = currentStatus === 'active' ? 'completed' : 'active';
         try {
             const userId = currentUser.id || currentUser._id;
-            const response = await fetch(`http://localhost:5000/api/items/${itemId}/status`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/items/${itemId}/status`, {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ userId, status: newStatus }),
@@ -66,7 +66,7 @@ const MyItems = () => {
         try {
             const userId = currentUser.id || currentUser._id;
 
-            const response = await fetch(`http://localhost:5000/api/items/${itemId}`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/items/${itemId}`, {
                 method: "DELETE",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ userId }),

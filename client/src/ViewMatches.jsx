@@ -21,7 +21,7 @@ const ViewMatches = () => {
     const fetchMyItems = async () => {
       try {
         const userId = currentUser.id || currentUser._id;
-        const response = await fetch(`http://localhost:5000/api/matches/my-items/${userId}`);
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/matches/my-items/${userId}`);
         if (!response.ok) throw new Error("Failed to fetch your items");
         const data = await response.json();
         setItems(data);

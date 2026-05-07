@@ -36,7 +36,7 @@ const AllPosts = () => {
         setSelectedPost({ title: 'Loading...' }); // Placeholder
         try {
             const userId = currentUser?._id || currentUser?.id;
-            const res = await fetch(`http://localhost:5000/api/admin/posts/${postId}`, {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/admin/posts/${postId}`, {
                 headers: { 'x-user-id': userId }
             });
             if (res.ok) {
@@ -63,7 +63,7 @@ const AllPosts = () => {
     const fetchUsers = async () => {
         try {
             const userId = currentUser?._id || currentUser?.id;
-            const res = await fetch('http://localhost:5000/api/admin/users', {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/admin/users`, {
                 headers: { 'x-user-id': userId }
             });
             if (res.ok) {
@@ -92,7 +92,7 @@ const AllPosts = () => {
 
             const queryString = queryParams.toString();
 
-            const res = await fetch(`http://localhost:5000/api/admin/posts?${queryString}`, {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/admin/posts?${queryString}`, {
                 headers: {
                     'x-user-id': userId
                 }

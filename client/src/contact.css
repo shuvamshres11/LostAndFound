@@ -2,6 +2,8 @@
   width: 100%;
   min-height: 100vh;
   background-color: #fff;
+  display: flex;
+  flex-direction: column;
 }
 
 .contact-main {
@@ -11,6 +13,7 @@
   margin-left: 50px;
   /* shift to left with some spacing */
   padding: 120px 40px 60px;
+  flex: 1;
 }
 
 .contact-header h1 {

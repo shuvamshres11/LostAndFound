@@ -14,7 +14,7 @@ const FoundItems = () => {
   const fetchItems = async () => {
     try {
       // Fetch ONLY active found items from server
-      const response = await fetch('http://localhost:5000/api/items?type=found&status=active');
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/items?type=found&status=active`);
       const data = await response.json();
       setItems(data);
     } catch (error) {
@@ -34,7 +34,7 @@ const FoundItems = () => {
     try {
       const userId = currentUser.id || currentUser._id;
 
-      const response = await fetch(`http://localhost:5000/api/items/${itemId}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/items/${itemId}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId }),

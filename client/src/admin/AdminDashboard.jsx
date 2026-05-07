@@ -24,7 +24,7 @@ const AdminDashboard = () => {
     const fetchStats = async () => {
         try {
             const userId = currentUser?._id || currentUser?.id;
-            const res = await fetch('http://localhost:5000/api/admin/stats', {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/admin/stats`, {
                 headers: { 'x-user-id': userId }
             });
             if (res.ok) setStats(await res.json());
@@ -36,7 +36,7 @@ const AdminDashboard = () => {
     const fetchRecentPosts = async () => {
         try {
             const userId = currentUser?._id || currentUser?.id;
-            const res = await fetch('http://localhost:5000/api/admin/posts?limit=5', {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/admin/posts?limit=5`, {
                 headers: { 'x-user-id': userId }
             });
             if (res.ok) {
