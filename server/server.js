@@ -12,14 +12,16 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173", // Vite's default port
+    origin: process.env.FRONTEND_URL || "http://localhost:5173", // Use env variable or default to local Vite
     methods: ["GET", "POST"]
   }
 });
 
 app.use(express.json({ limit: "10mb" })); // Increased limit for Base64 images
 app.use(express.urlencoded({ limit: "10mb", extended: true }));
-app.use(cors()); // This lets your React app talk to this server
+app.use(cors({
+  origin: process.env.FRONTEND_URL || "http://localhost:5173"
+})); // This lets your React app talk to this server
 
 // Make io accessible to our routers
 app.use((req, res, next) => {
