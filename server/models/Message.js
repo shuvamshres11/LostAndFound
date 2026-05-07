@@ -13,7 +13,24 @@ const messageSchema = new mongoose.Schema({
     },
     content: {
         type: String,
-        required: true
+        required: false
+    },
+    image: {
+        type: String,
+        required: false
+    },
+    replyToId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Message',
+        required: false
+    },
+    replyToContent: {
+        type: String,
+        required: false
+    },
+    replyToSenderName: {
+        type: String,
+        required: false
     },
     itemId: {
         type: mongoose.Schema.Types.ObjectId,

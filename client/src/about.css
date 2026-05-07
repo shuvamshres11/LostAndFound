@@ -66,3 +66,29 @@
   height: auto;
   filter: drop-shadow(0 20px 30px rgba(0,0,0,0.1));
 }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  .about-content {
+    flex-direction: column;
+    padding: 100px 24px 40px;
+    gap: 30px;
+    text-align: center;
+  }
+
+  .about-text-column h1 { font-size: 28px; }
+  .about-text-column h3 { font-size: 16px; }
+
+  .about-image-column {
+    justify-content: center;
+  }
+
+  .mockup-img { max-width: 100%; }
+
+  .feature-list li { justify-content: center; }
+}
+
+@media (max-width: 480px) {
+  .about-content { padding: 90px 16px 30px; }
+  .about-text-column h1 { font-size: 24px; }
+}

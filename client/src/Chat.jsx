@@ -21,10 +21,13 @@ const Chat = () => {
     const [activeChat, setActiveChat] = useState(null); // The user object we are chatting with
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState(initialMessage || ""); // Set initial message
+    const [selectedImage, setSelectedImage] = useState(null); // Image to send
+    const [replyingTo, setReplyingTo] = useState(null); // Message being replied to
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [chatToDelete, setChatToDelete] = useState(null);
     const messagesEndRef = useRef(null);
     const messagesContainerRef = useRef(null);
+    const fileInputRef = useRef(null);
 
     const fetchConversations = async () => {
         try {
@@ -76,16 +79,34 @@ const Chat = () => {
         }
     };
 
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onloadend = () => {
+                setSelectedImage(reader.result);
+            };
+        }
+    };
+
     const sendMessage = async () => {
-        if (newMessage.trim() === "") return;
+        if (newMessage.trim() === "" && !selectedImage) return;
         const messageData = {
             sender: currentUser.id || currentUser._id,
             receiver: activeChat._id,
             content: newMessage,
+            image: selectedImage,
+            replyToId: replyingTo ? replyingTo._id : null,
+            replyToContent: replyingTo ? (replyingTo.image && !replyingTo.content ? "📷 Photo" : replyingTo.content) : null,
+            replyToSenderName: replyingTo ? (replyingTo.sender === (currentUser.id || currentUser._id) ? "You" : activeChat.firstName) : null,
             itemId: null
         };
         await socket.emit("send_message", messageData);
         setNewMessage("");
+        setSelectedImage(null);
+        setReplyingTo(null);
+        if (fileInputRef.current) fileInputRef.current.value = "";
     };
 
     useEffect(() => {
@@ -248,22 +269,63 @@ const Chat = () => {
                                     const isMe = msg.sender === (currentUser.id || currentUser._id);
                                     return (
                                         <div key={index} className={`message-bubble ${isMe ? "me" : "other"}`}>
-                                            <p>{msg.content}</p>
+                                            <button className="reply-action-btn" onClick={() => setReplyingTo(msg)} title="Reply">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" style={{stroke: "currentColor", width: "16px", height: "16px", strokeWidth: 2}} strokeLinecap="round" strokeLinejoin="round" className="reply-svg"><polyline points="9 17 4 12 9 7"></polyline><path d="M20 18v-2a4 4 0 0 0-4-4H4"></path></svg>
+                                            </button>
+                                            {msg.replyToContent && (
+                                                <div className="embedded-reply-block" onClick={() => {}}>
+                                                    {msg.replyToSenderName && <strong className="reply-sender">{msg.replyToSenderName}</strong>}
+                                                    <span className="reply-text">{msg.replyToContent}</span>
+                                                </div>
+                                            )}
+                                            {msg.image && (
+                                                <img src={msg.image} alt="Sent file" className="message-image" />
+                                            )}
+                                            {msg.content && <p>{msg.content}</p>}
                                             <span className="time">{new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                                         </div>
                                     );
                                 })}
                                 <div ref={messagesEndRef} />
                             </div>
-                            <div className="input-area">
-                                <input
-                                    type="text"
-                                    placeholder="Type a message..."
-                                    value={newMessage}
-                                    onChange={(e) => setNewMessage(e.target.value)}
-                                    onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-                                />
-                                <button onClick={sendMessage}>Send</button>
+                            <div className="input-area-container">
+                                {replyingTo && (
+                                    <div className="reply-preview-banner">
+                                        <div className="reply-preview-content">
+                                            <strong>Replying to {replyingTo.sender === (currentUser.id || currentUser._id) ? "yourself" : activeChat.firstName}</strong>
+                                            <p>{replyingTo.image && !replyingTo.content ? "📷 Photo" : replyingTo.content}</p>
+                                        </div>
+                                        <button className="cancel-reply-btn" onClick={() => setReplyingTo(null)}>✕</button>
+                                    </div>
+                                )}
+                                {selectedImage && (
+                                    <div className="image-preview-container">
+                                        <img src={selectedImage} alt="Preview" className="image-preview" />
+                                        <button className="remove-image-btn" onClick={() => { setSelectedImage(null); if(fileInputRef.current) fileInputRef.current.value = ""; }}>✕</button>
+                                    </div>
+                                )}
+                                <div className="input-area">
+                                    <button className="attach-btn" onClick={() => fileInputRef.current.click()} title="Attach Image">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="20" height="20">
+                                            <path d="M12 5v14M5 12h14"/>
+                                        </svg>
+                                    </button>
+                                    <input 
+                                        type="file" 
+                                        accept="image/*" 
+                                        style={{display: 'none'}} 
+                                        ref={fileInputRef} 
+                                        onChange={handleImageChange} 
+                                    />
+                                    <input
+                                        type="text"
+                                        placeholder="Type a message..."
+                                        value={newMessage}
+                                        onChange={(e) => setNewMessage(e.target.value)}
+                                        onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+                                    />
+                                    <button className="send-btn" onClick={sendMessage}>Send</button>
+                                </div>
                             </div>
                         </>
                     ) : (

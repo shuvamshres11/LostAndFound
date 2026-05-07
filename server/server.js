@@ -32,9 +32,11 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/items', require('./routes/items'));
 app.use('/api/chat', require('./routes/chat'));
 app.use('/api/admin', require('./routes/admin'));
-
+app.get('/api', (req, res) => {
+  res.send("Backend is running")
+})
 app.use('/api/notifications', require('./routes/notifications')); // Register Notification Routes
-
+app.use('/api/matches', require('./routes/matches')); // Register Matches route
 // --- SOCKET.IO LOGIC ---
 io.on("connection", (socket) => {
   // console.log(`User Connected: ${socket.id}`);
@@ -56,6 +58,10 @@ io.on("connection", (socket) => {
         sender: data.sender,
         receiver: data.receiver,
         content: data.content,
+        image: data.image,
+        replyToId: data.replyToId,
+        replyToContent: data.replyToContent,
+        replyToSenderName: data.replyToSenderName,
         itemId: data.itemId
       });
       await newMessage.save();

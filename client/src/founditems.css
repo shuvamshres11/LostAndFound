@@ -80,3 +80,25 @@
   cursor: pointer;
   margin-top: 15px;
 }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  .content-container {
+    padding: 90px 16px 40px;
+  }
+
+  .page-header h1 { font-size: 28px; }
+
+  .item-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .image-box { height: 200px; }
+}
+
+@media (max-width: 480px) {
+  .content-container { padding: 80px 12px 30px; }
+  .page-header h1 { font-size: 24px; }
+  .image-box { height: 170px; }
+}

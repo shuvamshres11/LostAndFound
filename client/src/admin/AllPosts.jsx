@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import AdminNav from './AdminNav';
 import { useToast } from '../components/ToastContext';
 import { useNavigate } from 'react-router-dom';
+import './admin.css';
 
 const AllPosts = () => {
     const [posts, setPosts] = useState([]);
@@ -30,8 +31,6 @@ const AllPosts = () => {
     const [isFetchingDetails, setIsFetchingDetails] = useState(false);
     const limit = 10;
 
-    // ... useEffect ...
-
     const openPostDetails = async (postId) => {
         setIsFetchingDetails(true);
         setSelectedPost({ title: 'Loading...' }); // Placeholder
@@ -57,9 +56,9 @@ const AllPosts = () => {
     };
 
     useEffect(() => {
-        fetchPosts(null, false, 1); // Initial fetch, page 1
+        fetchPosts(null, false, 1);
         fetchUsers();
-    }, []); // Only run once on mount
+    }, []); 
 
     const fetchUsers = async () => {
         try {
@@ -79,7 +78,6 @@ const AllPosts = () => {
     const fetchPosts = async (customFilters = null, showOverlay = true, page = 1) => {
         try {
             if (showOverlay) setLoading(true);
-            // Ensure customFilters is not a synthetic event from onClick
             const isEvent = customFilters && customFilters.preventDefault;
             const activeFilters = (customFilters && !isEvent) ? customFilters : filters;
 
@@ -102,7 +100,7 @@ const AllPosts = () => {
 
             if (res.ok) {
                 const data = await res.json();
-                setPosts(data.items || []); // Handle new structure
+                setPosts(data.items || []); 
                 setTotalPages(data.totalPages || 1);
                 setCurrentPage(data.currentPage || 1);
             } else {
@@ -127,45 +125,35 @@ const AllPosts = () => {
     };
 
     const handleSearch = () => {
-        fetchPosts(filters, true, 1); // Reset to page 1 on search
+        fetchPosts(filters, true, 1); 
     };
 
     return (
-        <div style={{ paddingTop: '80px', minHeight: '100vh', background: '#f8f9fa', position: 'relative' }}>
+        <div className="admin-page">
             <AdminNav />
 
             {/* Loading Overlay */}
             {loading && (
-                <div style={{
-                    position: 'fixed',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    height: '100%',
-                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    zIndex: 9999
-                }}>
+                <div className="admin-modal-overlay" style={{ zIndex: 9999 }}>
                     <div style={{
                         background: 'white',
-                        padding: '20px',
-                        borderRadius: '10px',
+                        padding: '24px 32px',
+                        borderRadius: '12px',
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'center',
-                        gap: '10px'
+                        gap: '16px',
+                        boxShadow: '0 10px 25px rgba(0,0,0,0.1)'
                     }}>
                         <div className="spinner" style={{
                             border: '4px solid #f3f3f3',
-                            borderTop: '4px solid #3498db',
+                            borderTop: '4px solid var(--admin-blue)',
                             borderRadius: '50%',
                             width: '40px',
                             height: '40px',
                             animation: 'spin 1s linear infinite'
                         }}></div>
-                        <span style={{ fontWeight: 'bold', color: '#333' }}>Loading...</span>
+                        <span style={{ fontWeight: '600', color: 'var(--admin-text)' }}>Loading...</span>
                     </div>
                     <style>
                         {`
@@ -178,207 +166,154 @@ const AllPosts = () => {
                 </div>
             )}
 
-            <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '20px' }}>
-                <h2 style={{ marginBottom: '20px', fontSize: '24px', fontWeight: 'bold' }}>All Posts</h2>
+            <div className="admin-container">
+                <div className="admin-page-header">
+                    <h1>All Posts</h1>
+                    <p>View all lost and found posts with advanced filtering.</p>
+                </div>
 
                 {/* Filters */}
-                <div style={{
-                    background: 'white',
-                    padding: '20px',
-                    borderRadius: '12px',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-                    marginBottom: '20px',
-                    display: 'flex',
-                    gap: '20px',
-                    flexWrap: 'wrap',
-                    alignItems: 'end'
-                }}>
-                    <div style={{ flex: 1, minWidth: '200px' }}>
-                        <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 'bold' }}>Type</label>
-                        <select
-                            name="type"
-                            value={filters.type}
-                            onChange={handleFilterChange}
-                            style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #ddd', backgroundColor: '#333', color: 'white' }}
-                        >
-                            <option value="all" style={{ backgroundColor: '#333', color: 'white' }}>All Types</option>
-                            <option value="lost" style={{ backgroundColor: '#333', color: 'white' }}>Lost</option>
-                            <option value="found" style={{ backgroundColor: '#333', color: 'white' }}>Found</option>
-                        </select>
-                    </div>
+                <div className="admin-card">
+                    <div className="admin-card-body">
+                        <div className="admin-toolbar" style={{ alignItems: 'flex-end', gap: '20px' }}>
+                            
+                            <div style={{ flex: 1, minWidth: '180px' }}>
+                                <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: '600', color: 'var(--admin-sub)' }}>Type</label>
+                                <select
+                                    name="type"
+                                    value={filters.type}
+                                    onChange={handleFilterChange}
+                                    className="admin-select"
+                                    style={{ width: '100%' }}
+                                >
+                                    <option value="all">All Types</option>
+                                    <option value="lost">Lost</option>
+                                    <option value="found">Found</option>
+                                </select>
+                            </div>
 
-                    <div style={{ flex: 1, minWidth: '200px' }}>
-                        <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 'bold' }}>Posted By (User)</label>
-                        <select
-                            name="postedBy"
-                            value={filters.postedBy}
-                            onChange={handleFilterChange}
-                            style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #ddd', backgroundColor: '#333', color: 'white' }}
-                        >
-                            <option value="" style={{ backgroundColor: '#333', color: 'white' }}>All Users</option>
-                            {users.map(user => (
-                                <option key={user._id} value={user._id} style={{ backgroundColor: '#333', color: 'white' }}>
-                                    {user.firstName} {user.lastName}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
+                            <div style={{ flex: 1, minWidth: '180px' }}>
+                                <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: '600', color: 'var(--admin-sub)' }}>Posted By</label>
+                                <select
+                                    name="postedBy"
+                                    value={filters.postedBy}
+                                    onChange={handleFilterChange}
+                                    className="admin-select"
+                                    style={{ width: '100%' }}
+                                >
+                                    <option value="">All Users</option>
+                                    {users.map(user => (
+                                        <option key={user._id} value={user._id}>
+                                            {user.firstName} {user.lastName}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
 
-                    <div style={{ flex: 1, minWidth: '200px' }}>
-                        <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 'bold' }}>Date</label>
-                        <input
-                            type="date"
-                            name="date"
-                            value={filters.date}
-                            onChange={handleFilterChange}
-                            style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #ddd', backgroundColor: '#333', color: 'white' }}
-                        />
-                    </div>
-                    <div style={{ paddingBottom: '2px', display: 'flex', gap: '10px' }}>
-                        <button
-                            onClick={handleSearch}
-                            style={{
-                                padding: '10px 20px',
-                                borderRadius: '8px',
-                                border: 'none',
-                                background: '#007bff',
-                                color: 'white',
-                                cursor: 'pointer',
-                                fontWeight: 'bold'
-                            }}>
-                            Search
-                        </button>
-                        <button
-                            onClick={() => {
-                                const resetFilters = { type: 'all', postedBy: '', date: '' };
-                                setFilters(resetFilters);
-                                // We need to pass these filters to fetchPosts because state update is async
-                                // So let's modify fetchPosts to accept optional filters
-                                fetchPosts(resetFilters, true, 1);
-                            }}
-                            style={{
-                                padding: '10px 20px',
-                                borderRadius: '8px',
-                                border: '1px solid #ccc',
-                                background: '#fff',
-                                cursor: 'pointer'
-                            }}>
-                            Clear
-                        </button>
+                            <div style={{ flex: 1, minWidth: '180px' }}>
+                                <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: '600', color: 'var(--admin-sub)' }}>Date</label>
+                                <input
+                                    type="date"
+                                    name="date"
+                                    value={filters.date}
+                                    onChange={handleFilterChange}
+                                    className="admin-select"
+                                    style={{ width: '100%' }}
+                                />
+                            </div>
+
+                            <div className="admin-btn-group" style={{ marginBottom: '2px' }}>
+                                <button className="admin-btn secondary" onClick={() => {
+                                    const resetFilters = { type: 'all', postedBy: '', date: '' };
+                                    setFilters(resetFilters);
+                                    fetchPosts(resetFilters, true, 1);
+                                }}>
+                                    Clear
+                                </button>
+                                <button className="admin-btn primary" onClick={handleSearch}>
+                                    🔍 Search
+                                </button>
+                            </div>
+
+                        </div>
                     </div>
                 </div>
 
-                {/* Posts Table/List */}
-                <div style={{ background: 'white', borderRadius: '12px', padding: '24px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
-                    <div style={{ overflowX: 'auto' }}>
-                        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                {/* Posts Table */}
+                <div className="admin-card">
+                    <div className="admin-table-wrap">
+                        <table className="admin-table">
                             <thead>
-                                <tr style={{ borderBottom: '2px solid #eee', textAlign: 'left' }}>
-                                    <th style={{ padding: '12px', width: '80px' }}>Image</th>
-                                    <th style={{ padding: '12px' }}>Title</th>
-                                    <th style={{ padding: '12px' }}>Type</th>
-                                    <th style={{ padding: '12px' }}>Posted By</th>
-                                    <th style={{ padding: '12px' }}>Date</th>
-                                    <th style={{ padding: '12px' }}>Category</th>
+                                <tr>
+                                    <th style={{ width: '60px' }}>Image</th>
+                                    <th>Title</th>
+                                    <th>Type</th>
+                                    <th>Posted By</th>
+                                    <th>Date</th>
+                                    <th>Category</th>
+                                    <th>Status</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {posts.map(post => (
-                                    <tr key={post._id} style={{ borderBottom: '1px solid #f5f5f5' }}>
-                                        <td style={{ padding: '12px' }}>
+                                {posts.length === 0 ? (
+                                    <tr className="empty-row">
+                                        <td colSpan={7}>No posts found matching filters.</td>
+                                    </tr>
+                                ) : posts.map(post => (
+                                    <tr key={post._id}>
+                                        <td>
                                             <button
+                                                className="admin-btn secondary"
                                                 onClick={() => openPostDetails(post._id)}
-                                                style={{
-                                                    padding: '6px 12px',
-                                                    background: '#eee',
-                                                    border: 'none',
-                                                    borderRadius: '4px',
-                                                    cursor: 'pointer',
-                                                    fontSize: '12px'
-                                                }}
+                                                style={{ padding: '4px 8px', fontSize: '12px' }}
                                             >
                                                 View
                                             </button>
                                         </td>
-                                        <td style={{ padding: '12px', fontWeight: '600' }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                {post.title}
-                                                <span style={{
-                                                    padding: '2px 8px',
-                                                    borderRadius: '12px',
-                                                    fontSize: '10px',
-                                                    fontWeight: 'bold',
-                                                    textTransform: 'uppercase',
-                                                    background: post.status === 'completed' ? '#d1fae5' : '#e0f2fe',
-                                                    color: post.status === 'completed' ? '#065f46' : '#0369a1',
-                                                    border: post.status === 'completed' ? '1px solid #a7f3d0' : '1px solid #bae6fd'
-                                                }}>
-                                                    {post.status === 'completed' ? 'Completed' : 'Active'}
-                                                </span>
-                                            </div>
-                                        </td>
-                                        <td style={{ padding: '12px' }}>
-                                            <span style={{
-                                                padding: '4px 12px',
-                                                borderRadius: '12px',
-                                                fontSize: '12px',
-                                                fontWeight: '600',
-                                                background: post.type === 'lost' ? '#ffebee' : '#e8f5e9',
-                                                color: post.type === 'lost' ? '#d32f2f' : '#388e3c'
-                                            }}>
-                                                {post.type.toUpperCase()}
+                                        <td style={{ fontWeight: '600' }}>{post.title}</td>
+                                        <td>
+                                            <span className={`admin-badge ${post.type}`}>
+                                                {post.type}
                                             </span>
                                         </td>
-                                        <td style={{ padding: '12px' }}>
+                                        <td>
                                             {post.user ? `${post.user.firstName} ${post.user.lastName}` : 'Unknown'}
                                         </td>
-                                        <td style={{ padding: '12px', color: '#666' }}>
+                                        <td style={{ color: 'var(--admin-sub)' }}>
                                             {new Date(post.createdAt).toLocaleDateString()}
                                         </td>
-                                        <td style={{ padding: '12px' }}>{post.category}</td>
+                                        <td>{post.category}</td>
+                                        <td>
+                                            <span className={`admin-badge ${post.status}`}>
+                                                {post.status}
+                                            </span>
+                                        </td>
                                     </tr>
                                 ))}
                             </tbody>
                         </table>
-                        {posts.length === 0 && (
-                            <p style={{ textAlign: 'center', padding: '40px', color: '#999' }}>No posts found matching filters.</p>
-                        )}
                     </div>
 
-                    {/* Pagination Controls */}
+                    {/* Pagination */}
                     {totalPages > 1 && (
-                        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '20px', gap: '15px' }}>
-                            <button
-                                onClick={() => handlePageChange(currentPage - 1)}
-                                disabled={currentPage === 1}
-                                style={{
-                                    padding: '8px 16px',
-                                    borderRadius: '6px',
-                                    border: '1px solid #ddd',
-                                    background: currentPage === 1 ? '#f5f5f5' : 'white',
-                                    cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
-                                    color: currentPage === 1 ? '#999' : '#333'
-                                }}
-                            >
-                                Previous
-                            </button>
-                            <span style={{ fontSize: '14px', color: '#666' }}>
-                                Page <strong>{currentPage}</strong> of <strong>{totalPages}</strong>
-                            </span>
-                            <button
-                                onClick={() => handlePageChange(currentPage + 1)}
-                                disabled={currentPage === totalPages}
-                                style={{
-                                    padding: '8px 16px',
-                                    borderRadius: '6px',
-                                    border: '1px solid #ddd',
-                                    background: currentPage === totalPages ? '#f5f5f5' : 'white',
-                                    cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
-                                    color: currentPage === totalPages ? '#999' : '#333'
-                                }}
-                            >
-                                Next
-                            </button>
+                        <div className="admin-pagination">
+                            <span>Showing page {currentPage} of {totalPages}</span>
+                            <div className="admin-pagination-btns">
+                                <button 
+                                    className="admin-page-btn"
+                                    onClick={() => handlePageChange(currentPage - 1)}
+                                    disabled={currentPage === 1}
+                                >
+                                    Previous
+                                </button>
+                                <button 
+                                    className="admin-page-btn"
+                                    onClick={() => handlePageChange(currentPage + 1)}
+                                    disabled={currentPage === totalPages}
+                                >
+                                    Next
+                                </button>
+                            </div>
                         </div>
                     )}
                 </div>
@@ -386,43 +321,34 @@ const AllPosts = () => {
 
             {/* View Modal */}
             {selectedPost && (
-                <div style={{
-                    position: 'fixed',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    height: '100%',
-                    backgroundColor: 'rgba(0,0,0,0.5)',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    zIndex: 10000
-                }} onClick={() => setSelectedPost(null)}>
-                    <div style={{
-                        background: 'white',
-                        padding: '20px',
-                        borderRadius: '12px',
-                        maxWidth: '500px',
-                        width: '90%',
-                        maxHeight: '80vh',
-                        overflowY: 'auto'
-                    }} onClick={e => e.stopPropagation()}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
-                            <h3 style={{ margin: 0, fontWeight: 'bold' }}>{selectedPost.title}</h3>
-                            <button onClick={() => setSelectedPost(null)} style={{ border: 'none', background: 'none', fontSize: '20px', cursor: 'pointer' }}>&times;</button>
+                <div className="admin-modal-overlay" onClick={() => setSelectedPost(null)}>
+                    <div className="admin-modal" style={{ maxWidth: '500px' }} onClick={e => e.stopPropagation()}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px', alignItems: 'center' }}>
+                            <h3 style={{ margin: 0 }}>{selectedPost.title}</h3>
+                            <button onClick={() => setSelectedPost(null)} style={{ border: 'none', background: 'none', fontSize: '24px', cursor: 'pointer', color: 'var(--admin-muted)' }}>&times;</button>
                         </div>
+
                         {isFetchingDetails ? (
-                            <div style={{ textAlign: 'center', padding: '20px' }}>Loading details...</div>
+                            <div style={{ textAlign: 'center', padding: '40px', color: 'var(--admin-muted)' }}>Loading details...</div>
                         ) : (
-                            <>
-                                <img src={selectedPost.image} alt={selectedPost.title} style={{ width: '100%', borderRadius: '8px', marginBottom: '15px' }} />
-                                <p><strong>Description:</strong> {selectedPost.description || "No description"}</p>
-                                <p><strong>Location:</strong> {selectedPost.location || "N/A"}</p>
-                                <p><strong>Status:</strong> {selectedPost.status ? (selectedPost.status === 'completed' ? 'Completed' : 'Active') : 'Active'}</p>
-                                <p><strong>Category:</strong> {selectedPost.category}</p>
-                                <p><strong>Posted By:</strong> {selectedPost.user?.firstName} {selectedPost.user?.lastName}</p>
-                                <p><strong>Date:</strong> {new Date(selectedPost.createdAt).toLocaleDateString()}</p>
-                            </>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                {selectedPost.image && (
+                                    <img src={selectedPost.image} alt={selectedPost.title} style={{ width: '100%', borderRadius: '8px', maxHeight: '250px', objectFit: 'contain', background: 'var(--admin-bg)' }} />
+                                )}
+                                
+                                <div style={{ fontSize: '14px', lineHeight: '1.6' }}>
+                                    <p><strong>Description:</strong> {selectedPost.description || "No description"}</p>
+                                    <p><strong>Location:</strong> {selectedPost.location || "N/A"}</p>
+                                    <p><strong>Category:</strong> {selectedPost.category}</p>
+                                    <p><strong>Posted By:</strong> {selectedPost.user?.firstName} {selectedPost.user?.lastName}</p>
+                                    <p><strong>Date:</strong> {new Date(selectedPost.createdAt).toLocaleDateString()}</p>
+                                    <div style={{ marginTop: '8px' }}>
+                                        <span className={`admin-badge ${selectedPost.status}`}>
+                                            {selectedPost.status}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
                         )}
                     </div>
                 </div>

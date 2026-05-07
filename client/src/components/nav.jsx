@@ -8,8 +8,7 @@ const Nav = () => {
   const [open, setOpen] = useState(false);
   const [notificationOpen, setNotificationOpen] = useState(false); // State for Notifications
   const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState([]);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
+
   const [notifications, setNotifications] = useState([]); // Store notification objects
   const [notificationCount, setNotificationCount] = useState(0); // Notification Count (Default 0)
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false); // State for Logout UI
@@ -39,10 +38,29 @@ const Nav = () => {
         })
         .catch(err => console.error("Error fetching notifications", err));
 
-      const handleReceiveMessage = (message) => {
+      const handleReceiveMessage = async (message) => {
         // Only increment if we are NOT on the chat page
         if (location.pathname !== '/chat') {
-          setNotificationCount(prev => prev + 1);
+          try {
+            const res = await fetch(`http://localhost:5000/api/auth/profile/${message.sender}`);
+            const senderUser = await res.json();
+            
+            const newMessageNotification = {
+              _id: message._id || `msg-${Date.now()}-${Math.random()}`,
+              type: 'message',
+              message: `You got a new message from ${senderUser.firstName} ${senderUser.lastName}`,
+              createdAt: message.timestamp || new Date(),
+              isRead: false,
+              senderId: message.sender
+            };
+
+            setNotifications(prev => [newMessageNotification, ...prev]);
+            setNotificationCount(prev => prev + 1);
+          } catch (err) {
+            console.error("Error fetching sender profile for notification:", err);
+            // Fallback: just increment count if profile fetch fails
+            setNotificationCount(prev => prev + 1);
+          }
         }
       };
 
@@ -61,26 +79,7 @@ const Nav = () => {
     }
   }, [userId, location.pathname]);
 
-  // Handle Search Debounce and Fetching
-  useEffect(() => {
-    const delayDebounceFn = setTimeout(async () => {
-      if (searchQuery.trim() === "") {
-        setSearchResults([]);
-        setIsSearchOpen(false);
-        return;
-      }
-      try {
-        const res = await fetch(`http://localhost:5000/api/items?search=${encodeURIComponent(searchQuery)}`);
-        const data = await res.json();
-        setSearchResults(data);
-        setIsSearchOpen(true);
-      } catch (err) {
-        console.error("Error fetching search results:", err);
-      }
-    }, 300);
 
-    return () => clearTimeout(delayDebounceFn);
-  }, [searchQuery]);
 
 
   // Close dropdowns when clicking outside
@@ -91,9 +90,6 @@ const Nav = () => {
       }
       if (notificationRef.current && !notificationRef.current.contains(e.target)) {
         setNotificationOpen(false);
-      }
-      if (searchRef.current && !searchRef.current.contains(e.target)) {
-        setIsSearchOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -114,6 +110,15 @@ const Nav = () => {
   };
 
   const handleNotificationItemClick = async (notification) => {
+    if (notification.type === 'message') {
+      setNotificationOpen(false);
+      // Remove it from the dropdown manually since we handle message reads in the Chat component
+      setNotifications(prev => prev.filter(n => n._id !== notification._id));
+      setNotificationCount(prev => Math.max(0, prev - 1));
+      navigate(`/chat?userId=${notification.senderId}`);
+      return;
+    }
+
     if (!notification.isRead) {
       try {
         // Mark as read in backend
@@ -129,6 +134,11 @@ const Nav = () => {
       } catch (err) {
         console.error("Error marking notification as read", err);
       }
+    }
+
+    if (notification.actionUrl) {
+      setNotificationOpen(false);
+      navigate(notification.actionUrl);
     }
   };
 
@@ -183,30 +193,22 @@ const Nav = () => {
               placeholder="Search items..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              onFocus={() => { if(searchQuery.trim() !== "") setIsSearchOpen(true); }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
+                }
+              }}
             />
-            {isSearchOpen && (
-              <div className="search-dropdown-menu">
-                 {searchResults.length === 0 ? (
-                    <div className="search-no-results">No items found</div>
-                 ) : (
-                    searchResults.map(item => (
-                      <div 
-                        key={item._id} 
-                        className="search-result-item"
-                        onClick={() => {
-                          setIsSearchOpen(false);
-                          setSearchQuery("");
-                          navigate(`/items/${item._id}`);
-                        }}
-                      >
-                        <div className="search-result-title">{item.title}</div>
-                        <div className="search-result-type" style={{ color: item.type?.toLowerCase() === 'lost' ? '#d32f2f' : '#2e7d32', fontSize: '12px', fontWeight: 'bold', textTransform: 'capitalize' }}>{item.type}</div>
-                      </div>
-                    ))
-                 )}
-              </div>
-            )}
+            <div 
+              className="search-icon-btn"
+              onClick={() => {
+                navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
+              }}
+            >
+              <svg viewBox="0 0 24 24" fill="white" height="24px" width="24px">
+                <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
+              </svg>
+            </div>
           </div>
 
           {/* Notification Icon */}

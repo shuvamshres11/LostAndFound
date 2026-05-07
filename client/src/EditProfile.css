@@ -217,3 +217,38 @@
   opacity: 0.7;
   cursor: not-allowed;
 }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  .edit-profile-container {
+    padding: 90px 16px 30px;
+  }
+
+  .edit-profile-content {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .profile-form-container {
+    padding: 24px;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .btn-cancel, .btn-save {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .edit-profile-container { padding: 80px 12px 20px; }
+  .profile-header h2 { font-size: 1.25rem; }
+}

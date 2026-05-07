@@ -1,17 +1,21 @@
-/* Reusing core nav styles but specific tweaks for LandingNav */
+/* ── LandingNav — Light Clean Theme ── */
+
 .landing-navbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 40px;
-    background-color: #ffffff;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-    /* Subtle shadow */
+    padding: 0 60px;
+    height: 66px;
+    background: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
     position: sticky;
     top: 0;
     z-index: 1000;
+    box-sizing: border-box;
 }
 
+/* ── Logo ── */
 .landing-nav-logo {
     flex: 0 0 auto;
 }
@@ -24,7 +28,7 @@
 }
 
 .landing-logo-img {
-    height: 45px;
+    height: 40px;
     width: auto;
     object-fit: contain;
     margin-right: 12px;
@@ -36,23 +40,24 @@
 }
 
 .landing-logo-title {
-    font-size: 20px;
+    font-size: 17px;
     font-weight: 800;
     color: #111827;
-    letter-spacing: -0.5px;
+    letter-spacing: -0.3px;
     line-height: 1;
+    font-family: "Poppins", sans-serif;
 }
 
 .landing-logo-sub {
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 600;
-    color: #000;
-    /* Changed to black */
-    letter-spacing: 2px;
+    color: #6b7280;
+    letter-spacing: 2.5px;
     text-transform: uppercase;
+    margin-top: 2px;
 }
 
-/* Center Links */
+/* ── Center Links ── */
 .landing-nav-links {
     display: flex;
     list-style: none;
@@ -65,59 +70,87 @@
     text-decoration: none;
     color: #4b5563;
     font-weight: 500;
-    font-size: 15px;
-    transition: color 0.2s;
+    font-size: 14px;
+    transition: color 0.2s ease;
+    position: relative;
+    padding-bottom: 2px;
+}
+
+.landing-nav-links li a::after {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0%;
+    height: 2px;
+    background: #111827;
+    border-radius: 2px;
+    transition: width 0.22s ease;
 }
 
 .landing-nav-links li a:hover,
 .landing-nav-links li a.active {
-    color: #3b82f6;
-    font-weight: 600;
+    color: #111827;
 }
 
+.landing-nav-links li a:hover::after,
+.landing-nav-links li a.active::after {
+    width: 100%;
+}
+
+/* ── Right Actions ── */
 .landing-nav-actions {
     display: flex;
-    gap: 15px;
+    gap: 10px;
     flex: 0 0 auto;
+    align-items: center;
 }
 
 .landing-btn-login,
 .landing-btn-signup {
-    padding: 10px 20px;
-    border-radius: 8px;
+    padding: 9px 20px;
+    border-radius: 9px;
     font-weight: 600;
-    font-size: 14px;
+    font-size: 13px;
     cursor: pointer;
     text-decoration: none;
-    transition: all 0.2s ease;
+    transition: all 0.22s ease;
+    font-family: "Poppins", sans-serif;
+    display: inline-flex;
+    align-items: center;
 }
 
 .landing-btn-login {
     color: #374151;
     background-color: transparent;
-    border: 1px solid transparent;
+    border: 1px solid #d1d5db;
 }
 
 .landing-btn-login:hover {
-    color: #111827;
     background-color: #f3f4f6;
+    border-color: #9ca3af;
+    color: #111827;
 }
 
 .landing-btn-signup {
-    background-color: #3b82f6;
+    background: #111827;
     color: white;
-    border: none;
+    border: 1px solid #111827;
 }
 
 .landing-btn-signup:hover {
-    background-color: #2563eb;
+    background: #374151;
+    border-color: #374151;
     transform: translateY(-1px);
 }
 
-/* Responsive adjustments */
+/* ── Responsive ── */
 @media (max-width: 900px) {
+    .landing-navbar {
+        padding: 0 24px;
+    }
+
     .landing-nav-links {
         display: none;
-        /* simple hide for mobile for now, or use hamburger if needed */
     }
 }

@@ -208,3 +208,26 @@
 .status-toggle-btn.mark-active:hover {
     background-color: #d1d5db; 
 }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+    .my-items-container {
+        padding: 30px 16px;
+    }
+
+    .my-items-header h1 { font-size: 24px; }
+    .section-title { font-size: 20px; }
+
+    .items-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .my-item-image-wrapper { height: 180px; }
+}
+
+@media (max-width: 480px) {
+    .my-items-container { padding: 20px 12px; }
+    .my-items-header h1 { font-size: 20px; }
+    .my-card-title { font-size: 16px; }
+}

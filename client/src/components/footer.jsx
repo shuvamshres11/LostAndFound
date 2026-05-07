@@ -18,24 +18,13 @@ const Footer = () => {
           </p>
         </div>
 
-        {/* Center: Links */}
-        <div className="footer-links">
-          <h4>Quick Links</h4>
-          <ul>
-            <li><Link to="/home">Home</Link></li>
-            <li><Link to="/lost-items">Lost Items</Link></li>
-            <li><Link to="/found-items">Found Items</Link></li>
-            <li><Link to="/post-item">Post an Item</Link></li>
-            <li><Link to="/about">About</Link></li>
-            <li><Link to="/contact">Contact</Link></li>
-          </ul>
-        </div>
+
 
         {/* Right: Info */}
         <div className="footer-info">
           <h4>Contact</h4>
-          <p>Email: support@lostfoundtracker.com</p>
-          <p>Built with ❤️ using AI & CLIP</p>
+          <p>Email: shuvamshres11@gmail.com</p>
+          <p>Phone: +977 9800633854</p>
         </div>
       </div>
 

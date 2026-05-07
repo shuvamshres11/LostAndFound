@@ -1,39 +1,54 @@
 import React, { useEffect, useState } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import Nav from './components/nav.jsx';
 import LandingNav from './components/LandingNav.jsx';
 import Footer from './components/footer.jsx';
 import { useToast } from "./components/ToastContext";
-import './lostitems.css'; // Reusing the styled CSS
+import './lostitems.css'; // We can reuse the same CSS for the grid layout
 
-const FoundItems = () => {
+const SearchResults = () => {
   const { showToast } = useToast();
+  const [searchParams] = useSearchParams();
+  const query = searchParams.get('q') || '';
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const currentUser = JSON.parse(localStorage.getItem("user"));
+  const navigate = useNavigate();
 
-  const fetchItems = async () => {
+  const fetchSearchResults = async () => {
+    setLoading(true);
     try {
-      // Fetch ONLY active found items from server
-      const response = await fetch('http://localhost:5000/api/items?type=found&status=active');
-      const data = await response.json();
+      // If there's a search query, fetch with search param, else fetch all active items
+      const url = query
+        ? `http://localhost:5000/api/items?search=${encodeURIComponent(query)}&status=active`
+        : `http://localhost:5000/api/items?status=active`;
+
+      const response = await fetch(url);
+      let data = await response.json();
+
+      // If query is empty, sort alphabetically by title
+      if (!query || query.trim() === '') {
+        data = data.sort((a, b) => a.title.localeCompare(b.title));
+      }
+
       setItems(data);
     } catch (error) {
-      console.error("Error fetching items:", error);
+      console.error("Error fetching search results:", error);
+      showToast("Error fetching search results.", "error");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchItems();
-  }, []);
+    fetchSearchResults();
+  }, [query]); // Re-fetch when the query URL parameter changes
 
   const handleDelete = async (itemId) => {
     if (!window.confirm("Are you sure you want to delete this post?")) return;
 
     try {
       const userId = currentUser.id || currentUser._id;
-
       const response = await fetch(`http://localhost:5000/api/items/${itemId}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
@@ -42,14 +57,14 @@ const FoundItems = () => {
 
       if (response.ok) {
         showToast("Post deleted successfully.", "success");
-        fetchItems();
+        fetchSearchResults(); // Refresh list
       } else {
         const data = await response.json();
-        alert(data.message || "Failed to delete post.");
+        showToast(data.message || "Failed to delete post.", "error");
       }
     } catch (error) {
       console.error("Error deleting item:", error);
-      alert("Error deleting item.");
+      showToast("Error deleting item.", "error");
     }
   };
 
@@ -58,27 +73,36 @@ const FoundItems = () => {
       {currentUser ? <Nav /> : <LandingNav />}
       <main className="content-container">
         <header className="page-header">
-          <h1>Found Items</h1>
-          <p>Browse recently reported found items. Is one of these yours?</p>
+          <h1>Search Results</h1>
+          <p>
+            {query.trim() === ''
+              ? "Showing all active items."
+              : `Showing results for "${query}"`}
+          </p>
         </header>
 
         {loading ? (
           <p>Loading items...</p>
         ) : items.length === 0 ? (
-          <p>No found items reported yet.</p>
+          <p>No items found matching your criteria.</p>
         ) : (
           <div className="item-grid">
             {items.map((item) => (
               <div key={item._id} className="item-card">
-                <div className="image-container" onClick={() => window.location.href = `/items/${item._id}`} style={{ cursor: 'pointer' }}>
+                <div className="image-container" onClick={() => navigate(`/items/${item._id}`)} style={{ cursor: 'pointer' }}>
                   <img src={item.image} alt={item.title} className="item-image" />
-                  <span className="status-badge found">Found</span>
+                  <span className={`status-badge ${item.type === 'lost' ? 'lost' : 'found'}`}>
+                    {item.type === 'lost' ? 'Lost' : 'Found'}
+                  </span>
 
                   {/* Delete Button for Owner */}
                   {currentUser && item.user && (currentUser.id === item.user._id || currentUser._id === item.user._id) && (
                     <button
                       className="delete-btn"
-                      onClick={() => handleDelete(item._id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDelete(item._id);
+                      }}
                       title="Delete your post"
                     >
                       🗑️
@@ -113,17 +137,23 @@ const FoundItems = () => {
                   </div>
 
                   <button
-                    className="action-btn found-btn"
+                    className={`action-btn ${item.type === 'lost' ? 'found-btn' : 'contact-btn'}`}
                     onClick={() => {
                       if (!currentUser) {
-                        showToast("Please login to claim this item.", "error");
+                        showToast("Please login to contact the author.", "error");
                         return;
                       }
-                      const defaultMessage = `I think this ${item.title} belongs to me.`;
+                      const defaultMessage = item.type === 'lost'
+                        ? `I have found your ${item.title}!`
+                        : `Is this ${item.title} yours?`;
                       window.location.href = `/chat?userId=${item.user._id}&message=${encodeURIComponent(defaultMessage)}`;
                     }}
+                    style={{
+                      background: '#007bff',
+                      color: 'white'
+                    }}
                   >
-                    Contact Finder
+                    {item.type === 'lost' ? 'I Found This' : 'Contact Finder'}
                   </button>
                 </div>
               </div>
@@ -136,4 +166,4 @@ const FoundItems = () => {
   );
 };
 
-export default FoundItems;
+export default SearchResults;

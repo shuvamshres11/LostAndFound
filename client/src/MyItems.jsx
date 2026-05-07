@@ -47,7 +47,7 @@ const MyItems = () => {
             });
 
             if (response.ok) {
-                setItems(prevItems => prevItems.map(item => 
+                setItems(prevItems => prevItems.map(item =>
                     item._id === itemId ? { ...item, status: newStatus } : item
                 ));
             } else {
@@ -156,11 +156,11 @@ const ItemCard = ({ item, handleDelete, handleStatusToggle, badgeClass, badgeTex
                 <div className="my-card-loc">
                     <span>📍</span> {item.location || "No location"}
                 </div>
-                <button 
+                <button
                     className={`status-toggle-btn ${isCompleted ? 'mark-active' : 'mark-completed'}`}
                     onClick={(e) => { e.stopPropagation(); handleStatusToggle(item._id, item.status || 'active'); }}
                 >
-                    {isCompleted ? 'Reopen Post' : 'Mark as Completed'}
+                    {isCompleted ? 'Reopen Post' : 'Close Post'}
                 </button>
             </div>
         </div>

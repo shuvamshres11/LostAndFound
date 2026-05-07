@@ -150,3 +150,38 @@ h1 {
     color: #888;
     font-style: italic;
 }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+    .item-details-container {
+        padding: 90px 16px 40px;
+    }
+
+    .details-card {
+        flex-direction: column !important;
+    }
+
+    .image-section,
+    .info-section {
+        width: 100% !important;
+    }
+
+    .image-section { max-height: 300px; }
+
+    h1 { font-size: 1.5rem; }
+
+    .action-buttons {
+        flex-direction: column;
+    }
+
+    .message-btn, .back-btn {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .item-details-container { padding: 80px 12px 30px; }
+    h1 { font-size: 1.3rem; }
+    .image-section { max-height: 240px; }
+}

@@ -91,7 +91,7 @@
 
 .nav-search-input {
   width: 250px;
-  padding: 8px 16px;
+  padding: 8px 36px 8px 16px;
   border-radius: 20px;
   border: 1px solid #ccc;
   outline: none;
@@ -99,6 +99,24 @@
   color: #fff;
   background-color: #333;
   transition: border-color 0.2s;
+}
+
+.search-icon-btn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s;
+  opacity: 0.85;
+}
+
+.search-icon-btn:hover {
+  opacity: 1;
 }
 
 .nav-search-input::placeholder {
@@ -109,54 +127,7 @@
   border-color: #007bff;
 }
 
-.search-dropdown-menu {
-  position: absolute;
-  top: 45px;
-  left: 0;
-  width: 100%;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-  overflow: hidden;
-  z-index: 102;
-  border: 1px solid #eaeaea;
-  max-height: 300px;
-  overflow-y: auto;
-}
 
-.search-no-results {
-  padding: 12px;
-  text-align: center;
-  color: #888;
-  font-size: 13px;
-}
-
-.search-result-item {
-  padding: 12px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid #f5f5f5;
-  cursor: pointer;
-}
-
-.search-result-item:last-child {
-  border-bottom: none;
-}
-
-.search-result-item:hover {
-  background: #f9f9f9;
-}
-
-.search-result-title {
-  font-size: 13px;
-  color: #333;
-  font-weight: 500;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 150px;
-}
 
 /* NOTIFICATIONS */
 .nav-notification {
@@ -366,4 +337,42 @@
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  .navbar {
+    padding: 0 20px;
+    height: 66px;
+  }
+
+  .nav-links { display: none; }
+
+  .nav-search-input { width: 180px; }
+
+  .nav-actions { gap: 14px; }
+
+  .profile-btn {
+    padding: 6px 14px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar { padding: 0 12px; height: 60px; }
+
+  .nav-search-input {
+    width: 130px;
+    padding: 6px 30px 6px 12px;
+    font-size: 13px;
+  }
+
+  .nav-actions { gap: 10px; }
+
+  .notification-dropdown {
+    right: -20px;
+    width: 250px;
+  }
+
+  .profile-dropdown { min-width: 140px; }
 }

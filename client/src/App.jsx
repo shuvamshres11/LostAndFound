@@ -16,6 +16,9 @@ import VerifyResetOtp from "./VerifyResetOtp.jsx";
 import ResetPassword from "./ResetPassword.jsx";
 import ItemDetails from "./ItemDetails.jsx"; // ✅ ADD THIS
 import Chat from "./Chat.jsx"; // ✅ ADD THIS
+import SearchResults from "./SearchResults.jsx"; // ✅ ADD THIS
+import ViewMatches from "./ViewMatches.jsx";
+import ItemMatches from "./ItemMatches.jsx";
 import { ToastProvider } from "./components/ToastContext.jsx";
 import LandingPage from "./LandingPage.jsx";
 import MyItems from "./MyItems.jsx";
@@ -51,6 +54,9 @@ export default function App() {
           <Route path="/items/:id" element={<ItemDetails />} />
           <Route path="/chat" element={<Chat />} />
           <Route path="/my-items" element={<MyItems />} />
+          <Route path="/search" element={<SearchResults />} />
+          <Route path="/matches" element={<ViewMatches />} />
+          <Route path="/matches/:itemId" element={<ItemMatches />} />
 
           {/* Admin Routes */}
           <Route path="/admin" element={<AdminDashboard />} />

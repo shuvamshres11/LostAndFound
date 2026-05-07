@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Item = require('../models/Item');
+const { getEmbedding, findAndNotifyMatches } = require('../utils/ai');
 
 // @route   POST /api/items
 // @desc    Create a new lost/found item post
@@ -25,7 +26,17 @@ router.post('/', async (req, res) => {
             image
         });
 
+        // Generate embedding
+        const embedding = await getEmbedding(image);
+        if (embedding && embedding.length > 0) {
+            newItem.embedding = embedding;
+        }
+
         const savedItem = await newItem.save();
+        
+        // Asynchronously check for matches and notify users
+        findAndNotifyMatches(savedItem);
+        
         res.status(201).json(savedItem);
     } catch (err) {
         console.error("Error creating item:", err);

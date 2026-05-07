@@ -192,3 +192,29 @@ footer {
 @media (max-width: 600px) {
   .field-row { grid-template-columns: 1fr; }
 }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  .page-layout { align-items: stretch; }
+
+  .main-content-viewport {
+    padding: 24px 16px;
+  }
+
+  .centered-form-wrapper {
+    max-width: 100%;
+  }
+
+  .actual-entry-form { padding: 20px; }
+
+  .photo-upload-zone { padding: 24px; }
+
+  .page-header-text { font-size: 14px; }
+
+  .tab-item { padding: 12px; font-size: 14px; }
+}
+
+@media (max-width: 480px) {
+  .main-content-viewport { padding: 16px 10px; }
+  .actual-entry-form { padding: 16px; gap: 16px; }
+}
