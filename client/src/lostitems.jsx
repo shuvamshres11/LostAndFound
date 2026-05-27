@@ -14,7 +14,7 @@ const LostItems = () => {
   const fetchItems = async () => {
     try {
       // Fetch ONLY active lost items from server
-      const response = await fetch('http://localhost:5000/api/items?type=lost&status=active');
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/items?type=lost&status=active`);
       const data = await response.json();
       setItems(data);
     } catch (error) {
