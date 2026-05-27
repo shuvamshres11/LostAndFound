@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { Icon } from "@iconify/react";
 import "./HomePage.css";
 import heroImage from "./assets/image.png";
 import LandingNav from "./components/LandingNav";
@@ -14,28 +15,27 @@ export default function LandingPage() {
 
     const features = [
         {
-            icon: "🧠",
+            icon: "fluent:brain-circuit-20-filled",
             title: "CLIP-Powered AI Matching",
             desc: "Our CLIP model finds the closest visual match no manual tagging required.",
         },
         {
-            icon: "⚡",
+            icon: "mdi:bell-alert",
             title: "Instant Notifications",
             desc: "Get real-time alerts the moment a high-confidence match is found for your lost or found item post.",
         },
         {
-            icon: "🔒",
+            icon: "mdi:shield-lock",
             title: "Secure Messaging",
             desc: "Communicate safely with finders or owners through our built-in encrypted chat, no phone numbers shared.",
         },
-
         {
-            icon: "🏷️",
-            title: "Smart catorigies",
-            desc: "catogorize items as electronics, pets, wallets, keys etc.",
+            icon: "mdi:tag-multiple",
+            title: "Smart Categories",
+            desc: "Categorize items as electronics, pets, wallets, keys etc.",
         },
         {
-            icon: "🆓",
+            icon: "mdi:open-source-initiative",
             title: "100% Free & Open Source",
             desc: "No paid APIs. CLIP runs entirely on CPU, making this platform affordable and scalable for everyone.",
         },
@@ -82,7 +82,7 @@ export default function LandingPage() {
                             <span className="stat-label">Free Usage</span>
                         </div>
                         <div className="stat-chip">
-                            <span className="stat-num">⚡</span>
+                            <span className="stat-num"><Icon icon="mdi:lightning-bolt" style={{verticalAlign:'middle'}} /></span>
                             <span className="stat-label">Real-time Alerts</span>
                         </div>
                     </div>
@@ -106,28 +106,28 @@ export default function LandingPage() {
                 <div className="steps">
                     <div className="step-card">
                         <div className="step-number">1</div>
-                        <div className="icon">📸</div>
+                        <div className="icon"><Icon icon="mdi:camera-plus" width="32" height="32" /></div>
                         <h3>Upload</h3>
                         <p>Take or upload a photo of the lost or found item along with optional tags and location.</p>
                     </div>
 
                     <div className="step-card">
                         <div className="step-number">2</div>
-                        <div className="icon">🧠</div>
+                        <div className="icon"><Icon icon="fluent:brain-circuit-20-filled" width="32" height="32" /></div>
                         <h3>AI Analyzes</h3>
                         <p>CLIP converts your image into a high-dimensional vector embedding for comparison.</p>
                     </div>
 
                     <div className="step-card">
                         <div className="step-number">3</div>
-                        <div className="icon">🔍</div>
+                        <div className="icon"><Icon icon="mdi:magnify-scan" width="32" height="32" /></div>
                         <h3>Smart Match</h3>
                         <p>The system ranks all posts by cosine similarity and surfaces the top visual matches.</p>
                     </div>
 
                     <div className="step-card">
                         <div className="step-number">4</div>
-                        <div className="icon">🔔</div>
+                        <div className="icon"><Icon icon="mdi:bell-ring" width="32" height="32" /></div>
                         <h3>Get Notified</h3>
                         <p>Receive an instant alert when a high-confidence match exceeds the threshold.</p>
                     </div>
@@ -169,7 +169,7 @@ export default function LandingPage() {
                 <div className="features-grid">
                     {features.map((f, i) => (
                         <div className="feature-card" key={i}>
-                            <div className="feature-icon-wrap">{f.icon}</div>
+                            <div className="feature-icon-wrap"><Icon icon={f.icon} width="28" height="28" /></div>
                             <h3>{f.title}</h3>
                             <p>{f.desc}</p>
                         </div>

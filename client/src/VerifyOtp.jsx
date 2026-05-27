@@ -37,11 +37,12 @@ export default function VerifyOtp() {
         const data = await response.json();
 
         if (response.ok) {
+          // Auto-login: save token + user to localStorage
+          localStorage.setItem("token", data.token);
+          localStorage.setItem("user", JSON.stringify(data.user));
           alert("Account created successfully!");
           navigate("/home");
         } else {
-          // ISSUE 1 FIX: This will now show the actual error from your backend 
-          // (e.g., "User already exists") instead of "Registration failed"
           alert(data.message || "Registration failed");
         }
       } catch (error) {

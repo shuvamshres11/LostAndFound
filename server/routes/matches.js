@@ -2,11 +2,12 @@ const express = require('express');
 const router = express.Router();
 const Item = require('../models/Item');
 const { calculateCosineSimilarity } = require('../utils/ai');
+const auth = require('../middleware/auth');
 
 // @route   GET /api/matches/my-items/:userId
 // @desc    Get all active items for a user that have an AI embedding
-// @access  Public (in real app, use auth middleware)
-router.get('/my-items/:userId', async (req, res) => {
+// @access  Private
+router.get('/my-items/:userId', auth, async (req, res) => {
     try {
         const userId = req.params.userId;
         const userItems = await Item.find({ 
@@ -23,8 +24,8 @@ router.get('/my-items/:userId', async (req, res) => {
 
 // @route   GET /api/matches/item/:itemId
 // @desc    Get AI matches for ONE specific item
-// @access  Public
-router.get('/item/:itemId', async (req, res) => {
+// @access  Private
+router.get('/item/:itemId', auth, async (req, res) => {
     try {
         const itemId = req.params.itemId;
         

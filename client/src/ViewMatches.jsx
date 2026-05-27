@@ -103,7 +103,7 @@ const ViewMatches = () => {
                     onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
                     onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
                     >
-                      View AI Matches ✨
+                      View AI Matches 
                     </Link>
                   </div>
                 </div>

@@ -1,11 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const Notification = require('../models/Notification');
+const auth = require('../middleware/auth');
 
 // @route   GET /api/notifications/:userId
 // @desc    Get all notifications for a user
-// @access  Private (id check)
-router.get('/:userId', async (req, res) => {
+// @access  Private
+router.get('/:userId', auth, async (req, res) => {
     try {
         const notifications = await Notification.find({ user: req.params.userId })
             .sort({ createdAt: -1 });
@@ -19,7 +20,7 @@ router.get('/:userId', async (req, res) => {
 // @route   PUT /api/notifications/:id/read
 // @desc    Mark notification as read
 // @access  Private
-router.put('/:id/read', async (req, res) => {
+router.put('/:id/read', auth, async (req, res) => {
     try {
         const notification = await Notification.findByIdAndUpdate(
             req.params.id,

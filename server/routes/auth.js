@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const auth = require('../middleware/auth');
 
 // --- SIGNUP ROUTE ---
 router.post('/signup', async (req, res) => {
@@ -27,7 +29,30 @@ router.post('/signup', async (req, res) => {
     });
     await newUser.save();
 
-    res.status(201).json({ message: "User created successfully!" });
+    // 4. Generate JWT Token
+    const payload = {
+      user: {
+        id: newUser._id,
+        role: newUser.role
+      }
+    };
+    
+    const token = jwt.sign(payload, process.env.JWT_SECRET || 'lostandfoundtracker_secret_key_2026', {
+      expiresIn: '7d'
+    });
+
+    res.status(201).json({ 
+      message: "User created successfully!",
+      token,
+      user: {
+        id: newUser._id,
+        email: newUser.email,
+        firstName: newUser.firstName,
+        lastName: newUser.lastName,
+        profilePicture: newUser.profilePicture,
+        role: newUser.role
+      }
+    });
   } catch (err) {
     res.status(500).json({ message: "Server error during registration" });
   }
@@ -50,9 +75,21 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ message: "Invalid password. Try again." });
     }
 
-    // 3. Success
+    // 3. Generate JWT Token
+    const payload = {
+      user: {
+        id: user._id,
+        role: user.role
+      }
+    };
+    
+    const token = jwt.sign(payload, process.env.JWT_SECRET || 'lostandfoundtracker_secret_key_2026', {
+      expiresIn: '7d'
+    });
+
     res.status(200).json({
       message: "Login successful!",
+      token,
       user: {
         id: user._id,
         email: user.email,
@@ -79,8 +116,13 @@ router.get('/profile/:id', async (req, res) => {
 });
 
 // --- UPDATE PROFILE ROUTE ---
-router.put('/profile/:id', async (req, res) => {
+router.put('/profile/:id', auth, async (req, res) => {
   try {
+    // Verify that the logged-in user matches the profile ID being updated
+    if (req.user.id !== req.params.id) {
+      return res.status(401).json({ message: "Not authorized to update this profile" });
+    }
+
     const { firstName, lastName, phone, bio, profilePicture } = req.body;
 
     // Find user and update

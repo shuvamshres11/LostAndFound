@@ -26,6 +26,11 @@ async def get_embedding(req: ImageRequest):
         if "," in base64_data:
             base64_data = base64_data.split(",")[1]
             
+        # Handle URL decoding where '+' may be replaced with ' '
+        base64_data = base64_data.replace(" ", "+")
+        # Ensure valid base64 padding
+        base64_data += "=" * ((4 - len(base64_data) % 4) % 4)
+
         image_data = base64.b64decode(base64_data)
         image = Image.open(BytesIO(image_data)).convert("RGB")
         
@@ -42,4 +47,6 @@ async def get_embedding(req: ImageRequest):
         
         return {"embedding": embedding}
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         raise HTTPException(status_code=400, detail=str(e))

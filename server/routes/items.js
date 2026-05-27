@@ -2,21 +2,22 @@ const express = require('express');
 const router = express.Router();
 const Item = require('../models/Item');
 const { getEmbedding, findAndNotifyMatches } = require('../utils/ai');
+const auth = require('../middleware/auth');
 
 // @route   POST /api/items
 // @desc    Create a new lost/found item post
 // @access  Public (should be private in real app, but user context passed from frontend for now)
-router.post('/', async (req, res) => {
+router.post('/', auth, async (req, res) => {
     try {
-        const { user, type, title, description, category, location, date, image } = req.body;
+        const { type, title, description, category, location, date, image } = req.body;
 
         // Basic validation
-        if (!user || !type || !title || !category || !image) {
+        if (!type || !title || !category || !image) {
             return res.status(400).json({ message: "Please fill in all required fields." });
         }
 
         const newItem = new Item({
-            user,
+            user: req.user.id,
             type,
             title,
             description,
@@ -92,17 +93,16 @@ router.get('/:id', async (req, res) => {
 // @route   DELETE /api/items/:id
 // @desc    Delete an item
 // @access  Public (protected by user check check manually)
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', auth, async (req, res) => {
     try {
         const item = await Item.findById(req.params.id);
-        const { userId } = req.body; // Expecting userId in body to verify ownership
 
         if (!item) {
             return res.status(404).json({ message: "Item not found" });
         }
 
         // Check if the user deleting is the owner
-        if (item.user.toString() !== userId) {
+        if (item.user.toString() !== req.user.id) {
             return res.status(401).json({ message: "Not authorized to delete this post" });
         }
 
@@ -117,17 +117,17 @@ router.delete('/:id', async (req, res) => {
 // @route   PATCH /api/items/:id/status
 // @desc    Update item status
 // @access  Public (protected by user check check manually)
-router.patch('/:id/status', async (req, res) => {
+router.patch('/:id/status', auth, async (req, res) => {
     try {
         const item = await Item.findById(req.params.id);
-        const { userId, status } = req.body;
+        const { status } = req.body;
 
         if (!item) {
             return res.status(404).json({ message: "Item not found" });
         }
 
         // Check if the user updating is the owner
-        if (item.user.toString() !== userId) {
+        if (item.user.toString() !== req.user.id) {
             return res.status(401).json({ message: "Not authorized to update this post's status" });
         }
 

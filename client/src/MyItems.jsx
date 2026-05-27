@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useToast } from "./components/ToastContext";
+import { Icon } from "@iconify/react";
 import Nav from './components/nav.jsx';
 import Footer from './components/footer.jsx';
 import './MyItems.css';
@@ -39,11 +40,10 @@ const MyItems = () => {
     const handleStatusToggle = async (itemId, currentStatus) => {
         const newStatus = currentStatus === 'active' ? 'completed' : 'active';
         try {
-            const userId = currentUser.id || currentUser._id;
             const response = await fetch(`${import.meta.env.VITE_API_URL}/items/${itemId}/status`, {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ userId, status: newStatus }),
+                body: JSON.stringify({ status: newStatus }),
             });
 
             if (response.ok) {
@@ -64,12 +64,9 @@ const MyItems = () => {
         if (!window.confirm("Are you sure you want to delete this post?")) return;
 
         try {
-            const userId = currentUser.id || currentUser._id;
-
             const response = await fetch(`${import.meta.env.VITE_API_URL}/items/${itemId}`, {
                 method: "DELETE",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ userId }),
             });
 
             if (response.ok) {
@@ -145,16 +142,18 @@ const ItemCard = ({ item, handleDelete, handleStatusToggle, badgeClass, badgeTex
                     onClick={(e) => { e.stopPropagation(); handleDelete(item._id); }}
                     title="Delete Post"
                 >
-                    🗑️
+                    <Icon icon="mdi:trash-can-outline" width="18" height="18" />
                 </button>
             </div>
             <div className="my-card-content">
                 <h3 className="my-card-title">{item.title}</h3>
                 <div className="my-card-date">
-                    <span>📅</span> {new Date(item.date).toLocaleDateString()}
+                    <Icon icon="mdi:calendar-outline" width="14" height="14" style={{verticalAlign:'middle', marginRight:'4px'}} />
+                    {new Date(item.date).toLocaleDateString()}
                 </div>
                 <div className="my-card-loc">
-                    <span>📍</span> {item.location || "No location"}
+                    <Icon icon="mdi:map-marker-outline" width="14" height="14" style={{verticalAlign:'middle', marginRight:'4px'}} />
+                    {item.location || "No location"}
                 </div>
                 <button
                     className={`status-toggle-btn ${isCompleted ? 'mark-active' : 'mark-completed'}`}

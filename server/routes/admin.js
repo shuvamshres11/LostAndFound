@@ -4,27 +4,14 @@ const mongoose = require('mongoose');
 const User = require('../models/User');
 const Item = require('../models/Item');
 const Notification = require('../models/Notification');
+const auth = require('../middleware/auth');
 
 // Middleware to check if user is admin
-// Since we don't have a full auth middleware yet that attaches user to req, 
-// we'll expect the frontend to send the user ID or we check it against the DB.
-// FOR NOW: We will assume the frontend sends the user ID in the header or body to verify identity.
-// IN A REAL APP: You would use JWT verification middleware here.
-// Let's implement a simple check based on a header 'x-user-id' for simplicity given the current context,
-// or better, fetches the user from DB to confirm role.
-
 const isAdmin = async (req, res, next) => {
-    const userId = req.headers['x-user-id'];
-    if (!userId) {
-        return res.status(401).json({ message: "Unauthorized: No user ID provided" });
-    }
-
     try {
-        const user = await User.findById(userId);
-        if (!user || user.role !== 'admin') {
+        if (!req.user || req.user.role !== 'admin') {
             return res.status(403).json({ message: "Access denied: Admins only" });
         }
-        req.adminUser = user;
         next();
     } catch (err) {
         return res.status(500).json({ message: "Server error checking admin status" });
@@ -34,7 +21,7 @@ const isAdmin = async (req, res, next) => {
 // @route   GET /api/admin/users
 // @desc    Get all users
 // @access  Admin
-router.get('/users', isAdmin, async (req, res) => {
+router.get('/users', auth, isAdmin, async (req, res) => {
     try {
         const users = await User.find().select('-password');
         res.json(users);
@@ -46,7 +33,7 @@ router.get('/users', isAdmin, async (req, res) => {
 // @route   DELETE /api/admin/users/:id
 // @desc    Delete a user
 // @access  Admin
-router.delete('/users/:id', isAdmin, async (req, res) => {
+router.delete('/users/:id', auth, isAdmin, async (req, res) => {
     try {
         await User.findByIdAndDelete(req.params.id);
         // Also delete their items? Optional but good practice
@@ -60,7 +47,7 @@ router.delete('/users/:id', isAdmin, async (req, res) => {
 // @route   GET /api/admin/posts
 // @desc    Get dashboard stats
 // @access  Admin
-router.get('/stats', isAdmin, async (req, res) => {
+router.get('/stats', auth, isAdmin, async (req, res) => {
     try {
         const lostCount = await Item.countDocuments({ type: 'lost' });
         const foundCount = await Item.countDocuments({ type: 'found' });
@@ -79,7 +66,7 @@ router.get('/stats', isAdmin, async (req, res) => {
 
 // @desc    Get single post by ID (with image)
 // @access  Admin
-router.get('/posts/:id', isAdmin, async (req, res) => {
+router.get('/posts/:id', auth, isAdmin, async (req, res) => {
     try {
         const item = await Item.findById(req.params.id)
             .populate('user', 'firstName lastName email');
@@ -97,7 +84,7 @@ router.get('/posts/:id', isAdmin, async (req, res) => {
 
 // @desc    Get all posts (for moderation) with filters
 // @access  Admin
-router.get('/posts', isAdmin, async (req, res) => {
+router.get('/posts', auth, isAdmin, async (req, res) => {
     try {
         const { type, postedBy, date, page = 1, limit = 10 } = req.query;
         // console.log("Admin Posts Filter Request:", req.query); // DEBUG LOG REMOVED
@@ -170,7 +157,7 @@ router.get('/posts', isAdmin, async (req, res) => {
 // @route   DELETE /api/admin/posts/:id
 // @desc    Delete a post with reason
 // @access  Admin
-router.delete('/posts/:id', isAdmin, async (req, res) => {
+router.delete('/posts/:id', auth, isAdmin, async (req, res) => {
     try {
         const { reason } = req.body; // Expecting reason in body
         const item = await Item.findById(req.params.id);
@@ -205,7 +192,7 @@ router.delete('/posts/:id', isAdmin, async (req, res) => {
 // @route   POST /api/admin/users/:id/warning
 // @desc    Send warning to user
 // @access  Admin
-router.post('/users/:id/warning', isAdmin, async (req, res) => {
+router.post('/users/:id/warning', auth, isAdmin, async (req, res) => {
     try {
         const { message } = req.body;
         const userId = req.params.id;

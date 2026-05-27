@@ -2,11 +2,17 @@ const express = require('express');
 const router = express.Router();
 const Message = require('../models/Message');
 const User = require('../models/User');
+const auth = require('../middleware/auth');
 
 // Get chat history between two users
-router.get('/history/:user1/:user2', async (req, res) => {
+router.get('/history/:user1/:user2', auth, async (req, res) => {
     try {
         const { user1, user2 } = req.params;
+
+        // Ensure requesting user is one of the participants
+        if (req.user.id !== user1 && req.user.id !== user2) {
+            return res.status(403).json({ message: "Not authorized to access this chat" });
+        }
 
         const messages = await Message.find({
             $or: [
@@ -23,9 +29,14 @@ router.get('/history/:user1/:user2', async (req, res) => {
 });
 
 // Get list of users the current user has chatted with
-router.get('/conversations/:userId', async (req, res) => {
+router.get('/conversations/:userId', auth, async (req, res) => {
     try {
         const { userId } = req.params;
+
+        // Ensure requesting user is the conversations owner
+        if (req.user.id !== userId) {
+            return res.status(403).json({ message: "Not authorized to access these conversations" });
+        }
 
         // Find all messages where the user is sender or receiver and NOT deleted by them
         const messages = await Message.find({
@@ -63,9 +74,14 @@ router.get('/conversations/:userId', async (req, res) => {
 });
 
 // Mark messages as read between two users
-router.post('/mark-read', async (req, res) => {
+router.post('/mark-read', auth, async (req, res) => {
     try {
         const { sender, receiver } = req.body; // sender is the current user (who read messages), receiver is the one who sent them
+
+        // Ensure requesting user is the one marking messages read (the receiver of the messages)
+        if (req.user.id !== sender) {
+            return res.status(403).json({ message: "Not authorized" });
+        }
 
         await Message.updateMany(
             { sender: receiver, receiver: sender, isRead: false },
@@ -79,9 +95,14 @@ router.post('/mark-read', async (req, res) => {
 });
 
 // Delete conversation (One-sided)
-router.post('/delete-conversation', async (req, res) => {
+router.post('/delete-conversation', auth, async (req, res) => {
     try {
         const { myId, otherId } = req.body;
+
+        // Ensure requesting user is the one deleting their conversation view
+        if (req.user.id !== myId) {
+            return res.status(403).json({ message: "Not authorized" });
+        }
 
         await Message.updateMany(
             {

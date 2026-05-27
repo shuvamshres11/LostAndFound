@@ -34,7 +34,8 @@ const Login = () => {
       const data = await response.json();
 
       if (response.ok) {
-        // Success: Store user data and redirect
+        // Success: Store token and user data, then redirect
+        localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
         showToast("Welcome back!", "success");
 
