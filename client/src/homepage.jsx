@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Icon } from "@iconify/react";
-import "./HomePage.css";
+import "./Homepage.css";
 import heroImage from "./assets/image.png";
 import Nav from "./components/nav";
 import Footer from "./components/footer";
