@@ -82,9 +82,53 @@ io.on("connection", (socket) => {
 });
 
 
+// Auto-seed admin user on startup
+const seedAdminOnStartup = async () => {
+  try {
+    const User = require('./models/User');
+    const bcrypt = require('bcryptjs');
+    const email = "admin@example.com";
+    
+    let admin = await User.findOne({ email });
+    if (!admin) {
+      const hashedPassword = await bcrypt.hash("admin123", 10);
+      admin = new User({
+        email,
+        password: hashedPassword,
+        firstName: "Admin",
+        lastName: "User",
+        role: "admin"
+      });
+      await admin.save();
+      console.log("✅ Auto-seeded new Admin user");
+    } else {
+      let updated = false;
+      if (admin.role !== 'admin') {
+        admin.role = 'admin';
+        updated = true;
+      }
+      // Ensure password is reset to admin123 in case of sync issues
+      const isMatch = await bcrypt.compare("admin123", admin.password);
+      if (!isMatch) {
+        admin.password = await bcrypt.hash("admin123", 10);
+        updated = true;
+      }
+      if (updated) {
+        await admin.save();
+        console.log("✅ Auto-updated Admin credentials and role");
+      }
+    }
+  } catch (err) {
+    console.error("❌ Auto-seeding Admin failed:", err);
+  }
+};
+
 // Connect to MongoDB (We will get this link in the next step)
 mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log("✅ MongoDB Connected"))
+  .then(() => {
+    console.log("✅ MongoDB Connected");
+    seedAdminOnStartup();
+  })
   .catch(err => console.log("❌ Connection Error:", err));
 
 const PORT = process.env.PORT || 5000;
