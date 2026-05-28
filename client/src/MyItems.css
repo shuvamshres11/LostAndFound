@@ -125,6 +125,8 @@
     cursor: pointer;
     transition: background 0.2s;
     font-size: 16px;
+    padding: 0;
+    color: #ef4444;
 }
 
 .my-delete-btn:hover {

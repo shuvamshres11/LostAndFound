@@ -4,6 +4,7 @@ import LandingNav from './components/LandingNav.jsx';
 import Footer from './components/footer.jsx';
 import { useToast } from "./components/ToastContext";
 import ConfirmationModal from './components/ConfirmationModal.jsx';
+import { Icon } from '@iconify/react';
 import './lostitems.css';
 
 const LostItems = () => {
@@ -97,7 +98,7 @@ const LostItems = () => {
                       }}
                       title="Delete your post"
                     >
-                      🗑️
+                      <Icon icon="mdi:trash-can-outline" width="18" height="18" />
                     </button>
                   )}
                 </div>
