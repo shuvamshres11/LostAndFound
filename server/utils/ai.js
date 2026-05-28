@@ -4,7 +4,12 @@ const Item = require('../models/Item');
 // Internal fetch wrapper for getting embedding from python microservice
 const getEmbedding = async (base64Image) => {
     try {
-        const aiUrl = process.env.AI_SERVICE_URL || 'http://127.0.0.1:8000';
+        let aiUrl = process.env.AI_SERVICE_URL || 'http://127.0.0.1:8000';
+        // Strip trailing slash if present to avoid double-slash (//embed) 404s
+        if (aiUrl.endsWith('/')) {
+            aiUrl = aiUrl.slice(0, -1);
+        }
+        
         const response = await fetch(`${aiUrl}/embed`, {
             method: 'POST',
             headers: {
