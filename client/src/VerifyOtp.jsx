@@ -56,7 +56,7 @@ export default function VerifyOtp() {
 
   return (
     <div className="verify-container">
-      <div className="verify-left">
+      <form className="verify-left" onSubmit={(e) => { e.preventDefault(); verifyOtp(); }}>
         <h2 className="verify-title">Verify OTP</h2>
         <input
           className="verify-input"
@@ -64,11 +64,12 @@ export default function VerifyOtp() {
           placeholder="Enter 6-digit OTP"
           value={userOtp}
           onChange={(e) => setUserOtp(e.target.value)}
+          required
         />
-        <button className="verify-btn" onClick={verifyOtp}>
+        <button className="verify-btn" type="submit">
           Verify
         </button>
-      </div>
+      </form>
       <div className="verify-divider"></div>
       <div className="verify-right">
         <img src={logo} alt="Logo" className="verify-logo" />

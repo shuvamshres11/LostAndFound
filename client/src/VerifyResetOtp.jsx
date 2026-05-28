@@ -27,7 +27,7 @@ export default function VerifyResetOtp() {
 
     return (
         <div className="verify-container">
-            <div className="verify-left">
+            <form className="verify-left" onSubmit={(e) => { e.preventDefault(); verifyOtp(); }}>
                 <h2 className="verify-title">Verify OTP</h2>
                 <p style={{ marginBottom: "20px", color: "#666" }}>Enter the code sent to {email}</p>
                 <input
@@ -36,14 +36,15 @@ export default function VerifyResetOtp() {
                     placeholder="Enter 6-digit OTP"
                     value={userOtp}
                     onChange={(e) => setUserOtp(e.target.value)}
+                    required
                 />
-                <button className="verify-btn" onClick={verifyOtp}>
+                <button className="verify-btn" type="submit">
                     Verify Code
                 </button>
                 <p style={{ marginTop: "15px", textAlign: "center" }}>
                     <Link to="/forgot-password" style={{ color: "#5c7cbe", textDecoration: "none" }}>Resend Code</Link>
                 </p>
-            </div>
+            </form>
             <div className="verify-divider"></div>
             <div className="verify-right">
                 <img src={logo} alt="Logo" className="verify-logo" />
