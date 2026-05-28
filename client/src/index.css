@@ -53,3 +53,18 @@ button {
   cursor: pointer;
   transition: all 0.2s ease;
 }
+
+/* Global Sticky Footer Layout */
+.full-page-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.content-container {
+  flex: 1;
+  width: 100%;
+  box-sizing: border-box;
+}
