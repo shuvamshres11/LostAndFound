@@ -219,7 +219,7 @@ export default function PostItem() {
                 <label>Location</label>
                 <input
                   type="text"
-                  placeholder="e.g. Central Park"
+                  placeholder="e.g. Naxal, Kathmandu"
                   name="location"
                   value={location}
                   onChange={onChange}

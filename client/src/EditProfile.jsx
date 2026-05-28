@@ -219,7 +219,7 @@ const EditProfile = () => {
                                     className="form-input"
                                     value={formData.phone}
                                     onChange={handleChange}
-                                    placeholder="+1 (555) 000-0000"
+                                    placeholder="+977 9800000000"
                                 />
                             </div>
 
