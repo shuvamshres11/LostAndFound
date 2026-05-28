@@ -3,12 +3,17 @@ import { useToast } from "./components/ToastContext";
 import { Icon } from "@iconify/react";
 import Nav from './components/nav.jsx';
 import Footer from './components/footer.jsx';
+import ConfirmationModal from './components/ConfirmationModal.jsx';
 import './MyItems.css';
 
 const MyItems = () => {
+    const { showToast } = useToast();
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(true);
     const currentUser = JSON.parse(localStorage.getItem("user"));
+    
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [itemToDelete, setItemToDelete] = useState(null);
 
     const fetchItems = async () => {
         try {
@@ -50,35 +55,44 @@ const MyItems = () => {
                 setItems(prevItems => prevItems.map(item =>
                     item._id === itemId ? { ...item, status: newStatus } : item
                 ));
+                showToast(`Post marked as ${newStatus}!`, "success");
             } else {
                 const data = await response.json();
-                alert(data.message || "Failed to update status.");
+                showToast(data.message || "Failed to update status.", "error");
             }
         } catch (error) {
             console.error("Error updating status:", error);
-            alert("Error updating status.");
+            showToast("Error updating status.", "error");
         }
     };
 
-    const handleDelete = async (itemId) => {
-        if (!window.confirm("Are you sure you want to delete this post?")) return;
+    const triggerDeleteConfirm = (itemId) => {
+        setItemToDelete(itemId);
+        setDeleteModalOpen(true);
+    };
+
+    const handleDelete = async () => {
+        if (!itemToDelete) return;
+        setDeleteModalOpen(false);
 
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/items/${itemId}`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/items/${itemToDelete}`, {
                 method: "DELETE",
                 headers: { "Content-Type": "application/json" },
             });
 
             if (response.ok) {
-                alert("Post deleted successfully.");
+                showToast("Post deleted successfully.", "success");
                 fetchItems(); // Refresh list
             } else {
                 const data = await response.json();
-                alert(data.message || "Failed to delete post.");
+                showToast(data.message || "Failed to delete post.", "error");
             }
         } catch (error) {
             console.error("Error deleting item:", error);
-            alert("Error deleting item.");
+            showToast("Error deleting item.", "error");
+        } finally {
+            setItemToDelete(null);
         }
     };
 
@@ -105,7 +119,7 @@ const MyItems = () => {
                         ) : (
                             <div className="items-grid">
                                 {lostItems.map(item => (
-                                    <ItemCard key={item._id} item={item} handleDelete={handleDelete} handleStatusToggle={handleStatusToggle} badgeClass="lost" badgeText="Lost" />
+                                    <ItemCard key={item._id} item={item} handleDelete={triggerDeleteConfirm} handleStatusToggle={handleStatusToggle} badgeClass="lost" badgeText="Lost" />
                                 ))}
                             </div>
                         )}
@@ -117,13 +131,20 @@ const MyItems = () => {
                         ) : (
                             <div className="items-grid">
                                 {foundItems.map(item => (
-                                    <ItemCard key={item._id} item={item} handleDelete={handleDelete} handleStatusToggle={handleStatusToggle} badgeClass="found" badgeText="Found" />
+                                    <ItemCard key={item._id} item={item} handleDelete={triggerDeleteConfirm} handleStatusToggle={handleStatusToggle} badgeClass="found" badgeText="Found" />
                                 ))}
                             </div>
                         )}
                     </>
                 )}
             </main>
+            <ConfirmationModal 
+                isOpen={deleteModalOpen} 
+                title="Delete Post" 
+                message="Are you sure you want to delete this post? This action cannot be undone." 
+                onConfirm={handleDelete} 
+                onCancel={() => { setDeleteModalOpen(false); setItemToDelete(null); }} 
+            />
             <Footer />
         </div>
     );

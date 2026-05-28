@@ -3,6 +3,7 @@ import Nav from './components/nav.jsx';
 import LandingNav from './components/LandingNav.jsx';
 import Footer from './components/footer.jsx';
 import { useToast } from "./components/ToastContext";
+import ConfirmationModal from './components/ConfirmationModal.jsx';
 import './lostitems.css'; // Reusing the styled CSS
 
 const FoundItems = () => {
@@ -10,6 +11,9 @@ const FoundItems = () => {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const currentUser = JSON.parse(localStorage.getItem("user"));
+
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState(null);
 
   const fetchItems = async () => {
     try {
@@ -28,13 +32,19 @@ const FoundItems = () => {
     fetchItems();
   }, []);
 
-  const handleDelete = async (itemId) => {
-    if (!window.confirm("Are you sure you want to delete this post?")) return;
+  const triggerDeleteConfirm = (itemId) => {
+    setItemToDelete(itemId);
+    setDeleteModalOpen(true);
+  };
+
+  const handleDelete = async () => {
+    if (!itemToDelete) return;
+    setDeleteModalOpen(false);
 
     try {
       const userId = currentUser.id || currentUser._id;
 
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/items/${itemId}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/items/${itemToDelete}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId }),
@@ -45,11 +55,13 @@ const FoundItems = () => {
         fetchItems();
       } else {
         const data = await response.json();
-        alert(data.message || "Failed to delete post.");
+        showToast(data.message || "Failed to delete post.", "error");
       }
     } catch (error) {
       console.error("Error deleting item:", error);
-      alert("Error deleting item.");
+      showToast("Error deleting item.", "error");
+    } finally {
+      setItemToDelete(null);
     }
   };
 
@@ -78,7 +90,7 @@ const FoundItems = () => {
                   {currentUser && item.user && (currentUser.id === item.user._id || currentUser._id === item.user._id) && (
                     <button
                       className="delete-btn"
-                      onClick={() => handleDelete(item._id)}
+                      onClick={() => triggerDeleteConfirm(item._id)}
                       title="Delete your post"
                     >
                       🗑️
@@ -131,6 +143,13 @@ const FoundItems = () => {
           </div>
         )}
       </main>
+      <ConfirmationModal 
+        isOpen={deleteModalOpen} 
+        title="Delete Post" 
+        message="Are you sure you want to delete this post? This action cannot be undone." 
+        onConfirm={handleDelete} 
+        onCancel={() => { setDeleteModalOpen(false); setItemToDelete(null); }} 
+      />
       <Footer />
     </div>
   );

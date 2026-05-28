@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import AdminNav from './AdminNav';
 import { useToast } from '../components/ToastContext';
 import { useNavigate } from 'react-router-dom';
+import ConfirmationModal from '../components/ConfirmationModal.jsx';
 import './admin.css';
 
 const ManageUsers = () => {
@@ -14,6 +15,9 @@ const ManageUsers = () => {
     const [warningModalOpen, setWarningModalOpen] = useState(false);
     const [userToWarn, setUserToWarn] = useState(null);
     const [warningMessage, setWarningMessage] = useState("");
+
+    const [banModalOpen, setBanModalOpen] = useState(false);
+    const [userToBan, setUserToBan] = useState(null);
 
     useEffect(() => {
         if (!currentUser || currentUser.role !== 'admin') {
@@ -38,22 +42,30 @@ const ManageUsers = () => {
         }
     };
 
-    const deleteUser = async (id) => {
-        if (!window.confirm("Are you sure you want to ban/delete this user?")) return;
+    const triggerBanConfirm = (id) => {
+        setUserToBan(id);
+        setBanModalOpen(true);
+    };
+
+    const deleteUser = async () => {
+        if (!userToBan) return;
+        setBanModalOpen(false);
         try {
             const userId = currentUser?._id || currentUser?.id;
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/admin/users/${id}`, {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/admin/users/${userToBan}`, {
                 method: 'DELETE',
                 headers: { 'x-user-id': userId }
             });
             if (res.ok) {
                 showToast("User deleted successfully", "success");
-                setUsers(users.filter(u => u._id !== id));
+                setUsers(users.filter(u => u._id !== userToBan));
             } else {
                 showToast("Failed to delete user", "error");
             }
         } catch (err) {
             showToast("Error deleting user", "error");
+        } finally {
+            setUserToBan(null);
         }
     };
 
@@ -158,7 +170,7 @@ const ManageUsers = () => {
                                                     </button>
                                                     <button
                                                         className="admin-btn danger"
-                                                        onClick={() => deleteUser(user._id)}
+                                                        onClick={() => triggerBanConfirm(user._id)}
                                                     >
                                                         🚫 Ban
                                                     </button>
@@ -196,6 +208,15 @@ const ManageUsers = () => {
                     </div>
                 </div>
             )}
+
+            <ConfirmationModal 
+                isOpen={banModalOpen} 
+                title="Ban User" 
+                message="Are you sure you want to ban/delete this user? This action cannot be undone." 
+                onConfirm={deleteUser} 
+                onCancel={() => { setBanModalOpen(false); setUserToBan(null); }} 
+                confirmText="Ban"
+            />
         </div>
     );
 };

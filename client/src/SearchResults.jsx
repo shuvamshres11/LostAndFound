@@ -4,6 +4,7 @@ import Nav from './components/nav.jsx';
 import LandingNav from './components/LandingNav.jsx';
 import Footer from './components/footer.jsx';
 import { useToast } from "./components/ToastContext";
+import ConfirmationModal from './components/ConfirmationModal.jsx';
 import './lostitems.css'; // We can reuse the same CSS for the grid layout
 
 const SearchResults = () => {
@@ -14,6 +15,9 @@ const SearchResults = () => {
   const [loading, setLoading] = useState(true);
   const currentUser = JSON.parse(localStorage.getItem("user"));
   const navigate = useNavigate();
+
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState(null);
 
   const fetchSearchResults = async () => {
     setLoading(true);
@@ -44,12 +48,18 @@ const SearchResults = () => {
     fetchSearchResults();
   }, [query]); // Re-fetch when the query URL parameter changes
 
-  const handleDelete = async (itemId) => {
-    if (!window.confirm("Are you sure you want to delete this post?")) return;
+  const triggerDeleteConfirm = (itemId) => {
+    setItemToDelete(itemId);
+    setDeleteModalOpen(true);
+  };
+
+  const handleDelete = async () => {
+    if (!itemToDelete) return;
+    setDeleteModalOpen(false);
 
     try {
       const userId = currentUser.id || currentUser._id;
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/items/${itemId}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/items/${itemToDelete}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId }),
@@ -65,6 +75,8 @@ const SearchResults = () => {
     } catch (error) {
       console.error("Error deleting item:", error);
       showToast("Error deleting item.", "error");
+    } finally {
+      setItemToDelete(null);
     }
   };
 
@@ -101,7 +113,7 @@ const SearchResults = () => {
                       className="delete-btn"
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleDelete(item._id);
+                        triggerDeleteConfirm(item._id);
                       }}
                       title="Delete your post"
                     >
@@ -161,6 +173,13 @@ const SearchResults = () => {
           </div>
         )}
       </main>
+      <ConfirmationModal 
+        isOpen={deleteModalOpen} 
+        title="Delete Post" 
+        message="Are you sure you want to delete this post? This action cannot be undone." 
+        onConfirm={handleDelete} 
+        onCancel={() => { setDeleteModalOpen(false); setItemToDelete(null); }} 
+      />
       <Footer />
     </div>
   );
