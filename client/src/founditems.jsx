@@ -127,19 +127,23 @@ const FoundItems = () => {
                     <span className="text">{new Date(item.date).toLocaleDateString()}</span>
                   </div>
 
-                  <button
-                    className="action-btn found-btn"
-                    onClick={() => {
-                      if (!currentUser) {
-                        showToast("Please login to claim this item.", "error");
-                        return;
-                      }
-                      const defaultMessage = `I think this ${item.title} belongs to me.`;
-                      window.location.href = `/chat?userId=${item.user._id}&message=${encodeURIComponent(defaultMessage)}`;
-                    }}
-                  >
-                    Contact Finder
-                  </button>
+                  {currentUser && item.user && (currentUser.id === item.user._id || currentUser._id === item.user._id) ? (
+                    <p className="own-post-msg" style={{ margin: '15px 0 0', textAlign: 'center', color: '#888', fontStyle: 'italic' }}>This is your post.</p>
+                  ) : (
+                    <button
+                      className="action-btn found-btn"
+                      onClick={() => {
+                        if (!currentUser) {
+                          showToast("Please login to claim this item.", "error");
+                          return;
+                        }
+                        const defaultMessage = `I think this ${item.title} belongs to me.`;
+                        window.location.href = `/chat?userId=${item.user._id}&message=${encodeURIComponent(defaultMessage)}`;
+                      }}
+                    >
+                      Contact Finder
+                    </button>
+                  )}
                 </div>
               </div>
             ))}

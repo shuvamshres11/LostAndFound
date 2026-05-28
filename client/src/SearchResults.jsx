@@ -148,25 +148,29 @@ const SearchResults = () => {
                     <span className="text">{new Date(item.date).toLocaleDateString()}</span>
                   </div>
 
-                  <button
-                    className={`action-btn ${item.type === 'lost' ? 'found-btn' : 'contact-btn'}`}
-                    onClick={() => {
-                      if (!currentUser) {
-                        showToast("Please login to contact the author.", "error");
-                        return;
-                      }
-                      const defaultMessage = item.type === 'lost'
-                        ? `I have found your ${item.title}!`
-                        : `Is this ${item.title} yours?`;
-                      window.location.href = `/chat?userId=${item.user._id}&message=${encodeURIComponent(defaultMessage)}`;
-                    }}
-                    style={{
-                      background: '#007bff',
-                      color: 'white'
-                    }}
-                  >
-                    {item.type === 'lost' ? 'I Found This' : 'Contact Finder'}
-                  </button>
+                  {currentUser && item.user && (currentUser.id === item.user._id || currentUser._id === item.user._id) ? (
+                    <p className="own-post-msg" style={{ margin: '15px 0 0', textAlign: 'center', color: '#888', fontStyle: 'italic' }}>This is your post.</p>
+                  ) : (
+                    <button
+                      className={`action-btn ${item.type === 'lost' ? 'found-btn' : 'contact-btn'}`}
+                      onClick={() => {
+                        if (!currentUser) {
+                          showToast("Please login to contact the author.", "error");
+                          return;
+                        }
+                        const defaultMessage = item.type === 'lost'
+                          ? `I have found your ${item.title}!`
+                          : `Is this ${item.title} yours?`;
+                        window.location.href = `/chat?userId=${item.user._id}&message=${encodeURIComponent(defaultMessage)}`;
+                      }}
+                      style={{
+                        background: '#007bff',
+                        color: 'white'
+                      }}
+                    >
+                      {item.type === 'lost' ? 'I Found This' : 'Contact Finder'}
+                    </button>
+                  )}
                 </div>
               </div>
             ))}
