@@ -24,38 +24,66 @@ const Nav = () => {
   useEffect(() => {
     if (userId) {
       socket.emit("join_room", userId);
+ 
+      // Fetch system notifications and chat conversations in parallel
+      Promise.all([
+        fetch(`${import.meta.env.VITE_API_URL}/notifications/${userId}`).then(res => res.json()),
+        fetch(`${import.meta.env.VITE_API_URL}/chat/conversations/${userId}`).then(res => res.json())
+      ])
+      .then(([sysNotifs, conversations]) => {
+        // Get conversations that have unread messages
+        const unreadConvs = Array.isArray(conversations) ? conversations.filter(c => c.unreadCount > 0) : [];
+        
+        // Map each unread conversation to a virtual message notification
+        const virtualMessageNotifs = unreadConvs.map(conv => ({
+          _id: `msg-${conv._id}`,
+          type: 'message',
+          message: `You got a new message from ${conv.firstName} ${conv.lastName}`,
+          createdAt: new Date(),
+          isRead: false,
+          senderId: conv._id
+        }));
 
-      // Fetch existing system notifications ONLY on mount or user change
-      // We essentially want this to be a separate effect or handled carefully.
-      // But keeping it here is fine if dependencies are stable.
-      fetch(`${import.meta.env.VITE_API_URL}/notifications/${userId}`)
-        .then(res => res.json())
-        .then(data => {
-          setNotifications(data);
-          // Reset count to correct number of unread, don't just add
-          const unreadCount = data.filter(n => !n.isRead).length;
-          setNotificationCount(unreadCount);
-        })
-        .catch(err => console.error("Error fetching notifications", err));
+        // Merge virtual message notifications at the top, then system notifications
+        const allNotifs = [...virtualMessageNotifs, ...sysNotifs];
+        setNotifications(allNotifs);
 
+        // Total count = unread system notifications + number of chats with unread messages
+        const sysUnreadCount = sysNotifs.filter(n => !n.isRead).length;
+        setNotificationCount(sysUnreadCount + virtualMessageNotifs.length);
+      })
+      .catch(err => console.error("Error fetching notifications or conversations", err));
+ 
       const handleReceiveMessage = async (message) => {
-        // Only increment if we are NOT on the chat page
+        // Only show notifications if we are NOT on the chat page
         if (location.pathname !== '/chat') {
           try {
             const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/profile/${message.sender}`);
             const senderUser = await res.json();
             
             const newMessageNotification = {
-              _id: message._id || `msg-${Date.now()}-${Math.random()}`,
+              _id: `msg-${message.sender}`,
               type: 'message',
               message: `You got a new message from ${senderUser.firstName} ${senderUser.lastName}`,
               createdAt: message.timestamp || new Date(),
               isRead: false,
               senderId: message.sender
             };
-
-            setNotifications(prev => [newMessageNotification, ...prev]);
-            setNotificationCount(prev => prev + 1);
+ 
+            setNotifications(prev => {
+              const alreadyHasMessage = prev.some(n => n.type === 'message' && n.senderId === message.sender);
+              if (alreadyHasMessage) {
+                // Just update the timestamp of the existing notification item
+                return prev.map(n => 
+                  (n.type === 'message' && n.senderId === message.sender)
+                    ? { ...n, createdAt: message.timestamp || new Date() }
+                    : n
+                );
+              } else {
+                setNotificationCount(c => c + 1);
+                return [newMessageNotification, ...prev];
+              }
+            });
           } catch (err) {
             console.error("Error fetching sender profile for notification:", err);
             // Fallback: just increment count if profile fetch fails
@@ -63,15 +91,15 @@ const Nav = () => {
           }
         }
       };
-
+ 
       const handleReceiveNotification = (notification) => {
         setNotifications(prev => [notification, ...prev]);
         setNotificationCount(prev => prev + 1);
       };
-
+ 
       socket.on("receive_message", handleReceiveMessage);
       socket.on("receive_notification", handleReceiveNotification);
-
+ 
       return () => {
         socket.off("receive_message", handleReceiveMessage);
         socket.off("receive_notification", handleReceiveNotification);
