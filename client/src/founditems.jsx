@@ -90,7 +90,10 @@ const FoundItems = () => {
                   {currentUser && item.user && (currentUser.id === item.user._id || currentUser._id === item.user._id) && (
                     <button
                       className="delete-btn"
-                      onClick={() => triggerDeleteConfirm(item._id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        triggerDeleteConfirm(item._id);
+                      }}
                       title="Delete your post"
                     >
                       🗑️
